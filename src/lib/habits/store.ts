@@ -43,7 +43,12 @@ function subscribe(l: Listener) {
 
 function useStoreSync() {
   const [, setTick] = useState(0);
-  useEffect(() => subscribe(() => setTick((t) => t + 1)), []);
+  useEffect(() => {
+    const unsub = subscribe(() => setTick((t) => t + 1));
+    return () => {
+      unsub();
+    };
+  }, []);
 }
 
 // ----- Public API -----
