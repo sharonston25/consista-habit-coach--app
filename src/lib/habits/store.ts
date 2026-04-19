@@ -1,5 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
-import type { Habit, HabitRecords, HabitStatus, UserProfile, AppSettings } from "./types";
+import type {
+  Habit,
+  HabitRecords,
+  HabitStatus,
+  UserProfile,
+  AppSettings,
+  DailyNotes,
+  CycleRecords,
+  CycleEntry,
+  WellnessRecords,
+  WellnessLog,
+} from "./types";
 import { PREDEFINED_HABITS } from "./seed";
 
 const KEYS = {
@@ -8,6 +19,9 @@ const KEYS = {
   profile: "consista:profile:v1",
   settings: "consista:settings:v1",
   visited: "consista:visited:v1",
+  notes: "consista:notes:v1",
+  cycle: "consista:cycle:v1",
+  wellness: "consista:wellness:v1",
 };
 
 function readLS<T>(key: string, fallback: T): T {
@@ -30,7 +44,6 @@ function writeLS<T>(key: string, value: T) {
   }
 }
 
-// Simple pub/sub so multiple components stay in sync
 type Listener = () => void;
 const listeners = new Set<Listener>();
 function emit() {
@@ -51,35 +64,34 @@ function useStoreSync() {
   }, []);
 }
 
-// ----- Public API -----
-
+// ----- Habits -----
 export function getHabits(): Habit[] {
   return readLS<Habit[]>(KEYS.habits, PREDEFINED_HABITS);
 }
-
 export function setHabits(h: Habit[]) {
   writeLS(KEYS.habits, h);
   emit();
 }
 
+// ----- Records -----
 export function getRecords(): HabitRecords {
   return readLS<HabitRecords>(KEYS.records, {});
 }
-
 export function setRecords(r: HabitRecords) {
   writeLS(KEYS.records, r);
   emit();
 }
 
+// ----- Profile -----
 export function getProfile(): UserProfile | null {
   return readLS<UserProfile | null>(KEYS.profile, null);
 }
-
 export function setProfile(p: UserProfile | null) {
   writeLS(KEYS.profile, p);
   emit();
 }
 
+// ----- Settings -----
 export function getSettings(): AppSettings {
   return readLS<AppSettings>(KEYS.settings, {
     theme: "light",
@@ -87,18 +99,44 @@ export function getSettings(): AppSettings {
     hasOnboarded: false,
   });
 }
-
 export function setSettings(s: AppSettings) {
   writeLS(KEYS.settings, s);
   emit();
 }
 
+// ----- Visited -----
 export function hasVisited(): boolean {
   return readLS<boolean>(KEYS.visited, false);
 }
-
 export function markVisited() {
   writeLS(KEYS.visited, true);
+}
+
+// ----- Daily notes -----
+export function getNotes(): DailyNotes {
+  return readLS<DailyNotes>(KEYS.notes, {});
+}
+export function setNotes(n: DailyNotes) {
+  writeLS(KEYS.notes, n);
+  emit();
+}
+
+// ----- Cycle -----
+export function getCycle(): CycleRecords {
+  return readLS<CycleRecords>(KEYS.cycle, {});
+}
+export function setCycle(c: CycleRecords) {
+  writeLS(KEYS.cycle, c);
+  emit();
+}
+
+// ----- Wellness -----
+export function getWellness(): WellnessRecords {
+  return readLS<WellnessRecords>(KEYS.wellness, {});
+}
+export function setWellness(w: WellnessRecords) {
+  writeLS(KEYS.wellness, w);
+  emit();
 }
 
 export function resetAll() {
@@ -135,11 +173,8 @@ export function useRecords() {
   const setStatus = useCallback((habitId: string, dateKey: string, status: HabitStatus) => {
     const r = getRecords();
     if (!r[habitId]) r[habitId] = {};
-    if (status === "empty") {
-      delete r[habitId][dateKey];
-    } else {
-      r[habitId][dateKey] = status;
-    }
+    if (status === "empty") delete r[habitId][dateKey];
+    else r[habitId][dateKey] = status;
     setRecords(r);
   }, []);
   const cycleStatus = useCallback((habitId: string, dateKey: string) => {
@@ -163,4 +198,62 @@ export function useProfile() {
 export function useSettings() {
   useStoreSync();
   return { settings: getSettings(), setSettings };
+}
+
+export function useNotes() {
+  useStoreSync();
+  const notes = getNotes();
+  const setNote = useCallback((dateKey: string, text: string) => {
+    const n = getNotes();
+    const trimmed = text.trim();
+    if (!trimmed) delete n[dateKey];
+    else n[dateKey] = trimmed;
+    setNotes(n);
+  }, []);
+  return { notes, setNote };
+}
+
+export function useCycle() {
+  useStoreSync();
+  const cycle = getCycle();
+  const upsertCycle = useCallback((dateKey: string, patch: Partial<CycleEntry>) => {
+    const c = getCycle();
+    const existing = c[dateKey] ?? { date: dateKey, isPeriod: false };
+    c[dateKey] = { ...existing, ...patch, date: dateKey };
+    setCycle(c);
+  }, []);
+  const togglePeriod = useCallback((dateKey: string) => {
+    const c = getCycle();
+    const existing = c[dateKey];
+    if (existing?.isPeriod) {
+      // clear isPeriod, but keep other data unless empty
+      if (!existing.symptoms?.length && !existing.mood && !existing.note && !existing.flow) {
+        delete c[dateKey];
+      } else {
+        c[dateKey] = { ...existing, isPeriod: false, flow: undefined };
+      }
+    } else {
+      c[dateKey] = { date: dateKey, isPeriod: true, flow: existing?.flow ?? "medium", ...existing };
+      c[dateKey].isPeriod = true;
+    }
+    setCycle(c);
+  }, []);
+  const removeCycle = useCallback((dateKey: string) => {
+    const c = getCycle();
+    delete c[dateKey];
+    setCycle(c);
+  }, []);
+  return { cycle, upsertCycle, togglePeriod, removeCycle };
+}
+
+export function useWellness() {
+  useStoreSync();
+  const wellness = getWellness();
+  const upsertWellness = useCallback((dateKey: string, patch: Partial<WellnessLog>) => {
+    const w = getWellness();
+    const existing = w[dateKey] ?? { date: dateKey };
+    w[dateKey] = { ...existing, ...patch, date: dateKey };
+    setWellness(w);
+  }, []);
+  return { wellness, upsertWellness };
 }
