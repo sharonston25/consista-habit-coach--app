@@ -3,7 +3,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSettings, useProfile, useHabits, resetAll } from "@/lib/habits/store";
 import { useTheme } from "@/hooks/use-theme";
-import { Moon, Sun, Lock, User, Trash2, Bell, ShieldCheck } from "lucide-react";
+import type { Gender } from "@/lib/habits/types";
+import { Moon, Sun, Lock, User, Trash2, Bell, ShieldCheck, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/settings")({
