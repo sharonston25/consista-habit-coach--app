@@ -73,15 +73,47 @@ function Settings() {
             maxLength={32}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className="flex-1 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-4"
+            className="flex-1 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm outline-none ring-primary/20 focus:ring-4"
           />
           <button
             type="submit"
-            className="rounded-xl gradient-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft hover:scale-[1.02]"
+            className="rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft hover:scale-[1.02]"
           >
             {savedName ? "✓ Saved" : "Save"}
           </button>
         </form>
+      </Card>
+
+      {/* Personalization */}
+      <Card icon={Heart} title="Personalization">
+        <p className="mb-2 text-xs text-muted-foreground">
+          Unlocks the Cycle tracker (female) or Wellness log (male).
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {(["female", "male", "other"] as Gender[]).map((g) => {
+            const active = profile?.gender === g;
+            return (
+              <button
+                key={g}
+                onClick={() =>
+                  setProfile({
+                    name: profile?.name ?? "Friend",
+                    gender: g,
+                    createdAt: profile?.createdAt ?? new Date().toISOString(),
+                  })
+                }
+                className={cn(
+                  "rounded-xl border px-3 py-2 text-sm font-semibold capitalize transition-all",
+                  active
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-border bg-background/60 text-muted-foreground hover:border-primary/40"
+                )}
+              >
+                {g}
+              </button>
+            );
+          })}
+        </div>
       </Card>
 
       {/* Theme */}
