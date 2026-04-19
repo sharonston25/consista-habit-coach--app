@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiCoachRouteImport } from './routes/api/coach'
+import { Route as AppWellnessRouteImport } from './routes/_app/wellness'
 import { Route as AppWeeklyRouteImport } from './routes/_app/weekly'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
+import { Route as AppPeriodRouteImport } from './routes/_app/period'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCoachRouteImport } from './routes/_app/coach'
 
@@ -32,6 +34,11 @@ const ApiCoachRoute = ApiCoachRouteImport.update({
   path: '/api/coach',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWellnessRoute = AppWellnessRouteImport.update({
+  id: '/wellness',
+  path: '/wellness',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppWeeklyRoute = AppWeeklyRouteImport.update({
   id: '/weekly',
   path: '/weekly',
@@ -45,6 +52,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPeriodRoute = AppPeriodRouteImport.update({
+  id: '/period',
+  path: '/period',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -62,18 +74,22 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
+  '/period': typeof AppPeriodRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
   '/weekly': typeof AppWeeklyRoute
+  '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
+  '/period': typeof AppPeriodRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
   '/weekly': typeof AppWeeklyRoute
+  '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
 }
 export interface FileRoutesById {
@@ -82,9 +98,11 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/coach': typeof AppCoachRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/period': typeof AppPeriodRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/weekly': typeof AppWeeklyRoute
+  '/_app/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
 }
 export interface FileRouteTypes {
@@ -93,18 +111,22 @@ export interface FileRouteTypes {
     | '/'
     | '/coach'
     | '/dashboard'
+    | '/period'
     | '/reports'
     | '/settings'
     | '/weekly'
+    | '/wellness'
     | '/api/coach'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/coach'
     | '/dashboard'
+    | '/period'
     | '/reports'
     | '/settings'
     | '/weekly'
+    | '/wellness'
     | '/api/coach'
   id:
     | '__root__'
@@ -112,9 +134,11 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/coach'
     | '/_app/dashboard'
+    | '/_app/period'
     | '/_app/reports'
     | '/_app/settings'
     | '/_app/weekly'
+    | '/_app/wellness'
     | '/api/coach'
   fileRoutesById: FileRoutesById
 }
@@ -147,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCoachRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/wellness': {
+      id: '/_app/wellness'
+      path: '/wellness'
+      fullPath: '/wellness'
+      preLoaderRoute: typeof AppWellnessRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/weekly': {
       id: '/_app/weekly'
       path: '/weekly'
@@ -166,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/period': {
+      id: '/_app/period'
+      path: '/period'
+      fullPath: '/period'
+      preLoaderRoute: typeof AppPeriodRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/dashboard': {
@@ -188,17 +226,21 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCoachRoute: typeof AppCoachRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppPeriodRoute: typeof AppPeriodRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppWeeklyRoute: typeof AppWeeklyRoute
+  AppWellnessRoute: typeof AppWellnessRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCoachRoute: AppCoachRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppPeriodRoute: AppPeriodRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppWeeklyRoute: AppWeeklyRoute,
+  AppWellnessRoute: AppWellnessRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -211,12 +253,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

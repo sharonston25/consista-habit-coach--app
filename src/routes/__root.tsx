@@ -35,7 +35,7 @@ export const Route = createRootRoute({
           "Consista is a beautifully crafted habit tracker with daily, weekly, monthly and yearly analytics, an AI coach, and gentle reminders to keep you consistent.",
       },
       { name: "author", content: "Consista" },
-      { name: "theme-color", content: "#7c3aed" },
+      { name: "theme-color", content: "#7d9b76" },
       { property: "og:title", content: "Consista — Smart Habit Tracking" },
       { property: "og:description", content: "Build daily habits with a beautiful, AI-powered tracker." },
       { property: "og:type", content: "website" },
