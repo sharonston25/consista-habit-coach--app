@@ -226,15 +226,18 @@ export function useCycle() {
     const c = getCycle();
     const existing = c[dateKey];
     if (existing?.isPeriod) {
-      // clear isPeriod, but keep other data unless empty
       if (!existing.symptoms?.length && !existing.mood && !existing.note && !existing.flow) {
         delete c[dateKey];
       } else {
         c[dateKey] = { ...existing, isPeriod: false, flow: undefined };
       }
     } else {
-      c[dateKey] = { date: dateKey, isPeriod: true, flow: existing?.flow ?? "medium", ...existing };
-      c[dateKey].isPeriod = true;
+      c[dateKey] = {
+        ...(existing ?? {}),
+        date: dateKey,
+        isPeriod: true,
+        flow: existing?.flow ?? "medium",
+      };
     }
     setCycle(c);
   }, []);
