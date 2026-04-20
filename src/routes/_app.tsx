@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import { ConsistaLogo } from "@/components/ConsistaLogo";
 import { useTheme } from "@/hooks/use-theme";
@@ -112,18 +112,9 @@ function AppLayout() {
         </div>
       </header>
 
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={loc.pathname}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          className="mx-auto max-w-2xl px-4 py-5"
-        >
-          <Outlet />
-        </motion.main>
-      </AnimatePresence>
+      <main key={loc.pathname} className="mx-auto max-w-2xl px-4 py-5 animate-in fade-in duration-200">
+        <Outlet />
+      </main>
 
       <BottomNav />
     </div>

@@ -1,5 +1,14 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Calendar, BarChart3, Sparkles, Settings as SettingsIcon, Heart, Dumbbell } from "lucide-react";
+import {
+  Home,
+  Calendar,
+  BarChart3,
+  Sparkles,
+  Settings as SettingsIcon,
+  Heart,
+  Dumbbell,
+  Apple,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/lib/habits/store";
@@ -17,8 +26,9 @@ export function BottomNav() {
 
   const items = [
     { to: "/dashboard" as const, label: "Today", icon: Home },
-    { to: "/weekly" as const, label: "Weekly", icon: Calendar },
+    { to: "/nutrition" as const, label: "Nutrition", icon: Apple },
     ...(middleItem ? [middleItem] : []),
+    { to: "/weekly" as const, label: "Weekly", icon: Calendar },
     { to: "/reports" as const, label: "Reports", icon: BarChart3 },
     { to: "/coach" as const, label: "Coach", icon: Sparkles },
     { to: "/settings" as const, label: "Settings", icon: SettingsIcon },
@@ -34,7 +44,7 @@ export function BottomNav() {
               <Link
                 to={to}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 px-1 py-2.5 text-[11px] transition-colors",
+                  "relative flex flex-col items-center gap-1 px-1 py-2.5 text-[10px] transition-colors",
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >

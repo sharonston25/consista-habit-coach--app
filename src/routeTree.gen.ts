@@ -17,6 +17,7 @@ import { Route as AppWeeklyRouteImport } from './routes/_app/weekly'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppPeriodRouteImport } from './routes/_app/period'
+import { Route as AppNutritionRouteImport } from './routes/_app/nutrition'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCoachRouteImport } from './routes/_app/coach'
 
@@ -59,6 +60,11 @@ const AppPeriodRoute = AppPeriodRouteImport.update({
   path: '/period',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNutritionRoute = AppNutritionRouteImport.update({
+  id: '/nutrition',
+  path: '/nutrition',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
+  '/nutrition': typeof AppNutritionRoute
   '/period': typeof AppPeriodRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
+  '/nutrition': typeof AppNutritionRoute
   '/period': typeof AppPeriodRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/coach': typeof AppCoachRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/nutrition': typeof AppNutritionRoute
   '/_app/period': typeof AppPeriodRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/coach'
     | '/dashboard'
+    | '/nutrition'
     | '/period'
     | '/reports'
     | '/settings'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/coach'
     | '/dashboard'
+    | '/nutrition'
     | '/period'
     | '/reports'
     | '/settings'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/coach'
     | '/_app/dashboard'
+    | '/_app/nutrition'
     | '/_app/period'
     | '/_app/reports'
     | '/_app/settings'
@@ -206,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeriodRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/nutrition': {
+      id: '/_app/nutrition'
+      path: '/nutrition'
+      fullPath: '/nutrition'
+      preLoaderRoute: typeof AppNutritionRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -226,6 +245,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCoachRoute: typeof AppCoachRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppNutritionRoute: typeof AppNutritionRoute
   AppPeriodRoute: typeof AppPeriodRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -236,6 +256,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCoachRoute: AppCoachRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppNutritionRoute: AppNutritionRoute,
   AppPeriodRoute: AppPeriodRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
