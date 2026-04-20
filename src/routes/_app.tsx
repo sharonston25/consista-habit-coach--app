@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import { ConsistaLogo } from "@/components/ConsistaLogo";
 import { useTheme } from "@/hooks/use-theme";
