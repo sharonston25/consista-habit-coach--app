@@ -13,7 +13,7 @@ export function useTheme() {
   return { theme: settings.theme, toggle };
 }
 
-export function useGreeting(): string {
+export function useGreeting(): { text: string; ready: boolean } {
   const { profile, mounted } = useProfile();
   const [tod, setTod] = useState<string>("");
 
@@ -32,7 +32,8 @@ export function useGreeting(): string {
     );
   }, []);
 
-  if (!mounted || !tod) return "";
+  const ready = mounted && !!tod;
+  if (!ready) return { text: "", ready: false };
   const name = profile?.name ?? "";
-  return name ? `${tod}, ${name}` : tod;
+  return { text: name ? `${tod}, ${name}` : tod, ready: true };
 }

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { useSettings, useProfile, useHabits, resetAll } from "@/lib/habits/store";
 import { useTheme } from "@/hooks/use-theme";
 import type { ActivityLevel, Gender, Goal, Role, UserProfile } from "@/lib/habits/types";
@@ -56,27 +57,41 @@ function Settings() {
   }, [profile]);
 
   const updateProfile = (patch: Partial<UserProfile>) => {
-    setProfile({
-      name: profile?.name ?? "Friend",
-      createdAt: profile?.createdAt ?? new Date().toISOString(),
-      ...profile,
-      ...patch,
-    });
+    const base: UserProfile = profile ?? {
+      name: "Friend",
+      createdAt: new Date().toISOString(),
+      activity: "moderate",
+      goal: "maintain",
+      stepGoal: 10000,
+    };
+    setProfile({ ...base, ...patch });
   };
 
   const saveName = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile({ name: name.trim() || "Friend" });
+    if (!name.trim()) {
+      toast.error("Please enter your name first.");
+      return;
+    }
+    updateProfile({ name: name.trim() });
     setSavedName(true);
+    toast.success("Name saved ✨");
     setTimeout(() => setSavedName(false), 1500);
   };
 
   const saveHealth = () => {
+    if (!age && !height && !weight) {
+      toast.error("Add at least your age, height or weight to save.");
+      return;
+    }
     updateProfile({
       age: age ? parseInt(age, 10) : undefined,
       heightCm: height ? parseInt(height, 10) : undefined,
       weightKg: weight ? parseInt(weight, 10) : undefined,
       stepGoal: parseInt(stepGoal, 10) || 10000,
+    });
+    toast.success("Health profile saved 💚", {
+      description: "Your BMI & calorie target will update across the app.",
     });
   };
 

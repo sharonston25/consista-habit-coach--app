@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { Dumbbell, Moon, Droplet, Zap, Heart } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { toast } from "sonner";
 import { useWellness } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
 import type { CycleMood } from "@/lib/habits/types";
@@ -111,11 +112,14 @@ function Wellness() {
           {MOODS.map((m) => (
             <button
               key={m.key}
-              onClick={() => upsertWellness(todayKey, { mood: m.key })}
+              onClick={() => {
+                upsertWellness(todayKey, { mood: m.key });
+                toast.success(`Mood logged: ${m.emoji}`);
+              }}
               className={cn(
                 "flex-1 rounded-lg border py-2 text-2xl transition-all",
                 log.mood === m.key
-                  ? "border-primary bg-primary/15"
+                  ? "border-primary bg-primary/15 scale-105"
                   : "border-border bg-background/60 hover:border-primary/40"
               )}
             >

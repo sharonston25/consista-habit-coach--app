@@ -56,7 +56,7 @@ function Dashboard() {
   const { notes, setNote } = useNotes();
   const { profile } = useProfile();
   const { nutrition } = useNutrition();
-  const greeting = useGreeting();
+  const { text: greeting, ready: greetingReady } = useGreeting();
   const [showAdd, setShowAdd] = useState(false);
 
   const today = useMemo(() => new Date(), []);
@@ -91,7 +91,9 @@ function Dashboard() {
     <div className="space-y-5">
       <div>
         <p className="text-sm text-muted-foreground">{format(today, "EEEE, MMMM d")}</p>
-        <h1 className="mt-1 text-[26px] font-semibold tracking-tight">{greeting}</h1>
+        <h1 className="mt-1 text-[26px] font-semibold tracking-tight min-h-[34px]">
+          {greetingReady ? greeting : <span className="opacity-0">.</span>}
+        </h1>
       </div>
 
       {/* Hero progress + stats */}
