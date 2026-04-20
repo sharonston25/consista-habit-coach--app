@@ -10,6 +10,8 @@ import type {
   CycleEntry,
   WellnessRecords,
   WellnessLog,
+  NutritionRecords,
+  MealEntry,
 } from "./types";
 import { PREDEFINED_HABITS } from "./seed";
 
@@ -22,6 +24,7 @@ const KEYS = {
   notes: "consista:notes:v1",
   cycle: "consista:cycle:v1",
   wellness: "consista:wellness:v1",
+  nutrition: "consista:nutrition:v1",
 };
 
 function readLS<T>(key: string, fallback: T): T {
@@ -54,14 +57,22 @@ function subscribe(l: Listener) {
   return () => listeners.delete(l);
 }
 
+/**
+ * Mount-aware store sync.
+ * Returns `mounted` flag — components SHOULD render skeleton/empty until mounted
+ * to avoid SSR hydration mismatches (since real values come from localStorage).
+ */
 function useStoreSync() {
+  const [mounted, setMounted] = useState(false);
   const [, setTick] = useState(0);
   useEffect(() => {
+    setMounted(true);
     const unsub = subscribe(() => setTick((t) => t + 1));
     return () => {
       unsub();
     };
   }, []);
+  return mounted;
 }
 
 // ----- Habits -----
@@ -139,6 +150,15 @@ export function setWellness(w: WellnessRecords) {
   emit();
 }
 
+// ----- Nutrition -----
+export function getNutrition(): NutritionRecords {
+  return readLS<NutritionRecords>(KEYS.nutrition, {});
+}
+export function setNutrition(n: NutritionRecords) {
+  writeLS(KEYS.nutrition, n);
+  emit();
+}
+
 export function resetAll() {
   if (typeof window === "undefined") return;
   Object.values(KEYS).forEach((k) => window.localStorage.removeItem(k));
@@ -148,8 +168,8 @@ export function resetAll() {
 // ----- Hooks -----
 
 export function useHabits() {
-  useStoreSync();
-  const habits = getHabits();
+  const mounted = useStoreSync();
+  const habits = mounted ? getHabits() : [];
   const update = useCallback((h: Habit[]) => setHabits(h), []);
   const addHabit = useCallback((h: Omit<Habit, "id" | "createdAt">) => {
     const next: Habit = { ...h, id: `h-${Date.now()}`, createdAt: new Date().toISOString() };
@@ -164,12 +184,12 @@ export function useHabits() {
   const updateHabit = useCallback((id: string, patch: Partial<Habit>) => {
     setHabits(getHabits().map((h) => (h.id === id ? { ...h, ...patch } : h)));
   }, []);
-  return { habits, setHabits: update, addHabit, removeHabit, updateHabit };
+  return { habits, mounted, setHabits: update, addHabit, removeHabit, updateHabit };
 }
 
 export function useRecords() {
-  useStoreSync();
-  const records = getRecords();
+  const mounted = useStoreSync();
+  const records = mounted ? getRecords() : {};
   const setStatus = useCallback((habitId: string, dateKey: string, status: HabitStatus) => {
     const r = getRecords();
     if (!r[habitId]) r[habitId] = {};
@@ -187,22 +207,28 @@ export function useRecords() {
     else r[habitId][dateKey] = next;
     setRecords(r);
   }, []);
-  return { records, setStatus, cycleStatus };
+  return { records, mounted, setStatus, cycleStatus };
 }
 
 export function useProfile() {
-  useStoreSync();
-  return { profile: getProfile(), setProfile };
+  const mounted = useStoreSync();
+  return { profile: mounted ? getProfile() : null, mounted, setProfile };
 }
 
 export function useSettings() {
-  useStoreSync();
-  return { settings: getSettings(), setSettings };
+  const mounted = useStoreSync();
+  return {
+    settings: mounted
+      ? getSettings()
+      : { theme: "light" as const, pinEnabled: false, hasOnboarded: false },
+    mounted,
+    setSettings,
+  };
 }
 
 export function useNotes() {
-  useStoreSync();
-  const notes = getNotes();
+  const mounted = useStoreSync();
+  const notes = mounted ? getNotes() : {};
   const setNote = useCallback((dateKey: string, text: string) => {
     const n = getNotes();
     const trimmed = text.trim();
@@ -210,12 +236,12 @@ export function useNotes() {
     else n[dateKey] = trimmed;
     setNotes(n);
   }, []);
-  return { notes, setNote };
+  return { notes, mounted, setNote };
 }
 
 export function useCycle() {
-  useStoreSync();
-  const cycle = getCycle();
+  const mounted = useStoreSync();
+  const cycle = mounted ? getCycle() : {};
   const upsertCycle = useCallback((dateKey: string, patch: Partial<CycleEntry>) => {
     const c = getCycle();
     const existing = c[dateKey] ?? { date: dateKey, isPeriod: false };
@@ -246,17 +272,46 @@ export function useCycle() {
     delete c[dateKey];
     setCycle(c);
   }, []);
-  return { cycle, upsertCycle, togglePeriod, removeCycle };
+  return { cycle, mounted, upsertCycle, togglePeriod, removeCycle };
 }
 
 export function useWellness() {
-  useStoreSync();
-  const wellness = getWellness();
+  const mounted = useStoreSync();
+  const wellness = mounted ? getWellness() : {};
   const upsertWellness = useCallback((dateKey: string, patch: Partial<WellnessLog>) => {
     const w = getWellness();
     const existing = w[dateKey] ?? { date: dateKey };
     w[dateKey] = { ...existing, ...patch, date: dateKey };
     setWellness(w);
   }, []);
-  return { wellness, upsertWellness };
+  return { wellness, mounted, upsertWellness };
+}
+
+export function useNutrition() {
+  const mounted = useStoreSync();
+  const nutrition = mounted ? getNutrition() : {};
+  const addMeal = useCallback((dateKey: string, meal: Omit<MealEntry, "id">) => {
+    const n = getNutrition();
+    const existing = n[dateKey] ?? { date: dateKey, meals: [] };
+    n[dateKey] = {
+      ...existing,
+      date: dateKey,
+      meals: [...existing.meals, { ...meal, id: `m-${Date.now()}` }],
+    };
+    setNutrition(n);
+  }, []);
+  const removeMeal = useCallback((dateKey: string, mealId: string) => {
+    const n = getNutrition();
+    const existing = n[dateKey];
+    if (!existing) return;
+    n[dateKey] = { ...existing, meals: existing.meals.filter((m) => m.id !== mealId) };
+    setNutrition(n);
+  }, []);
+  const setSteps = useCallback((dateKey: string, steps: number) => {
+    const n = getNutrition();
+    const existing = n[dateKey] ?? { date: dateKey, meals: [] };
+    n[dateKey] = { ...existing, date: dateKey, steps: Math.max(0, Math.round(steps)) };
+    setNutrition(n);
+  }, []);
+  return { nutrition, mounted, addMeal, removeMeal, setSteps };
 }
