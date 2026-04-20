@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Landing,
-  ssr: false,
 });
 
 function Landing() {
