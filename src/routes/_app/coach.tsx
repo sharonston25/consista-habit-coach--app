@@ -223,15 +223,17 @@ function Coach() {
 
       {showNudge && (
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-3 flex items-start gap-3 rounded-2xl border border-border/60 p-4 text-primary-foreground shadow-elegant"
-          style={{ background: "var(--gradient-aurora)" }}
+          transition={{ duration: 0.2 }}
+          className="mb-3 flex items-start gap-3 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft"
         >
-          <Heart className="mt-0.5 h-5 w-5 shrink-0" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Heart className="h-4 w-4" />
+          </div>
           <div>
-            <p className="font-semibold">Hey, no pressure.</p>
-            <p className="mt-1 text-sm opacity-90">
+            <p className="font-semibold text-foreground">Hey, no pressure.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               Your last week's been a bit off ({consist}%). One tiny win today resets everything. Want to talk it through?
             </p>
           </div>
