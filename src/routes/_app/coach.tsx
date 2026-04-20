@@ -39,7 +39,7 @@ All habits: ${list}`;
 }
 
 function Coach() {
-  const { habits } = useHabits();
+  const { habits, mounted } = useHabits();
   const { records } = useRecords();
   const { profile } = useProfile();
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -192,9 +192,9 @@ function Coach() {
     }
   };
 
-  // Encouragement banner when consistency drops
-  const consist = consistencyScore(habits, records, 7);
-  const showNudge = messages.length === 0 && consist < 50 && habits.length > 0;
+  // Encouragement banner when consistency drops — only after mount to avoid SSR hydration mismatch
+  const consist = mounted ? consistencyScore(habits, records, 7) : 0;
+  const showNudge = mounted && messages.length === 0 && consist < 50 && habits.length > 0;
 
   const suggestions = [
     "How can I be more consistent?",
