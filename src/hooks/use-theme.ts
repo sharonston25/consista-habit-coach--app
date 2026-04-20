@@ -8,15 +8,31 @@ export function useTheme() {
     if (settings.theme === "dark") root.classList.add("dark");
     else root.classList.remove("dark");
   }, [settings.theme]);
-  const toggle = () => setSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" });
+  const toggle = () =>
+    setSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" });
   return { theme: settings.theme, toggle };
 }
 
 export function useGreeting(): string {
-  const { profile } = useProfile();
-  const [name, setName] = useState(profile?.name ?? "");
-  useEffect(() => setName(profile?.name ?? ""), [profile?.name]);
-  const h = new Date().getHours();
-  const tod = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : h < 21 ? "Good evening" : "Good night";
+  const { profile, mounted } = useProfile();
+  const [tod, setTod] = useState<string>("");
+
+  useEffect(() => {
+    const h = new Date().getHours();
+    setTod(
+      h < 5
+        ? "Good night"
+        : h < 12
+          ? "Good morning"
+          : h < 17
+            ? "Good afternoon"
+            : h < 21
+              ? "Good evening"
+              : "Good night",
+    );
+  }, []);
+
+  if (!mounted || !tod) return "";
+  const name = profile?.name ?? "";
   return name ? `${tod}, ${name}` : tod;
 }
