@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { Apple, Flame, Plus, X, Settings as SettingsIcon } from "lucide-react";
+import { Apple, Flame, Plus, X, Settings as SettingsIcon, Footprints } from "lucide-react";
+import { toast } from "sonner";
 import { useNutrition, useProfile } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
 import {
@@ -60,10 +61,23 @@ function Nutrition() {
 
   const addCustom = () => {
     const k = parseInt(customKcal, 10);
-    if (!customName.trim() || !Number.isFinite(k) || k <= 0) return;
+    if (!customName.trim()) {
+      toast.error("Add a meal name first.");
+      return;
+    }
+    if (!Number.isFinite(k) || k <= 0) {
+      toast.error("Add a calorie amount (kcal) for your meal.");
+      return;
+    }
     addMeal(todayKey, { name: customName.trim(), kcal: k });
+    toast.success(`Logged ${customName.trim()} (${k} kcal)`);
     setCustomName("");
     setCustomKcal("");
+  };
+
+  const handleAddSteps = (inc: number) => {
+    setSteps(todayKey, (log.steps ?? 0) + inc);
+    toast.success(`+${inc.toLocaleString()} steps · ${stepsToKcal(inc)} kcal burned`);
   };
 
   if (!mounted) {
@@ -154,7 +168,7 @@ function Nutrition() {
                 {[500, 1000, 2500].map((inc) => (
                   <button
                     key={inc}
-                    onClick={() => setSteps(todayKey, (log.steps ?? 0) + inc)}
+                    onClick={() => handleAddSteps(inc)}
                     className="flex-1 rounded-lg border border-border bg-background/60 px-2 py-1 text-[11px] font-semibold hover:border-primary/40"
                   >
                     +{inc.toLocaleString()}
@@ -162,7 +176,10 @@ function Nutrition() {
                 ))}
               </div>
               <button
-                onClick={() => setSteps(todayKey, 0)}
+                onClick={() => {
+                  setSteps(todayKey, 0);
+                  toast.message("Steps reset to 0");
+                }}
                 className="mt-1 text-[10px] text-muted-foreground hover:text-destructive"
               >
                 Reset
@@ -236,8 +253,11 @@ function Nutrition() {
           {QUICK_MEALS.map((m) => (
             <button
               key={m.name}
-              onClick={() => addMeal(todayKey, { name: m.name, kcal: m.kcal })}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+              onClick={() => {
+                addMeal(todayKey, { name: m.name, kcal: m.kcal });
+                toast.success(`${m.emoji} ${m.name} · +${m.kcal} kcal`);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/40 hover:bg-primary/5 transition-colors"
             >
               <span>{m.emoji}</span>
               <span>{m.name}</span>
