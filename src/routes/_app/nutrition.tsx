@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { Apple, Flame, Plus, X, Settings as SettingsIcon, Footprints } from "lucide-react";
+import { Apple, Flame, Plus, X, Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useNutrition, useProfile } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
