@@ -9,7 +9,6 @@ import {
   Dumbbell,
   Apple,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/lib/habits/store";
 
@@ -48,13 +47,7 @@ export function BottomNav() {
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {active && (
-                  <motion.span
-                    layoutId="nav-active"
-                    className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-primary"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
+                {active && <span className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-primary" />}
                 <Icon className="h-[18px] w-[18px]" />
                 <span className="font-medium">{label}</span>
               </Link>

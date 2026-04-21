@@ -38,6 +38,11 @@
   --color-ring: var(--ring);
   --color-glass: var(--glass);
   --color-glass-border: var(--glass-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-metric-a: var(--metric-a);
+  --color-metric-b: var(--metric-b);
+  --color-metric-c: var(--metric-c);
 }
 
 :root {
@@ -76,6 +81,9 @@
   --warning: oklch(0.78 0.12 80);
   --warning-foreground: oklch(0.25 0.04 80);
 
+  --info: oklch(0.72 0.07 220);
+  --info-foreground: oklch(0.24 0.02 150);
+
   /* Period tracking color (soft rose) */
   --period: oklch(0.68 0.13 15);
   --period-foreground: oklch(0.99 0.005 110);
@@ -86,6 +94,9 @@
 
   --glass: oklch(1 0 0 / 0.7);
   --glass-border: oklch(0.9 0.012 130 / 0.6);
+  --metric-a: oklch(0.75 0.08 220);
+  --metric-b: oklch(0.72 0.08 150);
+  --metric-c: oklch(0.78 0.1 80);
 
   /* Habit category colors — softer, calmer */
   --habit-water: oklch(0.7 0.08 220);
@@ -152,6 +163,9 @@
   --warning: oklch(0.8 0.12 80);
   --warning-foreground: oklch(0.16 0.012 150);
 
+  --info: oklch(0.68 0.08 220);
+  --info-foreground: oklch(0.95 0.008 110);
+
   --period: oklch(0.72 0.13 15);
   --period-foreground: oklch(0.16 0.012 150);
 
@@ -161,6 +175,9 @@
 
   --glass: oklch(0.21 0.015 150 / 0.7);
   --glass-border: oklch(1 0 0 / 0.08);
+  --metric-a: oklch(0.7 0.08 220);
+  --metric-b: oklch(0.7 0.08 150);
+  --metric-c: oklch(0.8 0.1 80);
 
   --habit-water: oklch(0.72 0.09 220);
   --habit-exercise: oklch(0.75 0.11 45);

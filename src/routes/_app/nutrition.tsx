@@ -34,6 +34,11 @@ function Nutrition() {
   const profileReady = !!(profile?.heightCm && profile?.weightKg && profile?.age);
   const target = profile ? dailyCalories(profile) : null;
   const stepGoal = profile?.stepGoal ?? 10000;
+  const profileMetrics = [
+    { label: "Age", value: profile?.age ?? 0, suffix: "y", max: 100, tone: "bg-[var(--metric-c)]" },
+    { label: "Height", value: profile?.heightCm ?? 0, suffix: "cm", max: 220, tone: "bg-[var(--metric-a)]" },
+    { label: "Weight", value: profile?.weightKg ?? 0, suffix: "kg", max: 180, tone: "bg-[var(--metric-b)]" },
+  ];
 
   const eaten = log.meals.reduce((a, m) => a + m.kcal, 0);
   const burnedFromSteps = stepsToKcal(log.steps ?? 0);
@@ -201,8 +206,8 @@ function Nutrition() {
               className={cn(
                 "rounded-full px-2 py-0.5 text-[11px] font-semibold",
                 cat.tone === "primary" && "bg-primary/15 text-primary",
-                cat.tone === "ocean" && "bg-[oklch(0.7_0.08_220_/_0.18)] text-[oklch(0.45_0.1_220)] dark:text-[oklch(0.78_0.09_220)]",
-                cat.tone === "warm" && "bg-warning/20 text-[oklch(0.45_0.1_70)] dark:text-[oklch(0.85_0.12_80)]",
+                cat.tone === "ocean" && "bg-info/15 text-info",
+                cat.tone === "warm" && "bg-warning/20 text-warning-foreground",
                 cat.tone === "destructive" && "bg-destructive/15 text-destructive",
               )}
             >
@@ -210,7 +215,7 @@ function Nutrition() {
             </span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {profile?.heightCm} cm · {profile?.weightKg} kg
+            {profile?.age} y · {profile?.heightCm} cm · {profile?.weightKg} kg
           </p>
           {/* BMI scale bar */}
           <div className="relative mt-3 h-2 overflow-hidden rounded-full bg-muted">
@@ -241,6 +246,56 @@ function Nutrition() {
             </div>
           </div>
         )}
+      </section>
+
+      <section className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold">Body metrics</p>
+              <p className="text-xs text-muted-foreground">Your saved health profile is reflected here and updates nutrition targets.</p>
+            </div>
+            <Link to="/settings" className="text-xs font-medium text-primary hover:underline">
+              Edit
+            </Link>
+          </div>
+          <div className="mt-4 space-y-3">
+            {profileMetrics.map((metric) => {
+              const pct = Math.max(0, Math.min(100, Math.round((metric.value / metric.max) * 100)));
+              return (
+                <div key={metric.label}>
+                  <div className="mb-1 flex items-center justify-between text-xs">
+                    <span className="font-medium text-foreground">{metric.label}</span>
+                    <span className="text-muted-foreground">
+                      {metric.value ? `${metric.value} ${metric.suffix}` : "Not saved"}
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div className={cn("h-full rounded-full transition-all", metric.tone)} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+          <p className="text-sm font-semibold">Why steps matter</p>
+          <div className="mt-3 space-y-3 text-xs text-muted-foreground">
+            <div className="rounded-xl bg-background/60 p-3">
+              <p className="font-medium text-foreground">Daily movement supports calorie balance</p>
+              <p className="mt-1">Your steps increase estimated energy burn and help keep your target realistic day to day.</p>
+            </div>
+            <div className="rounded-xl bg-background/60 p-3">
+              <p className="font-medium text-foreground">Consistency beats intensity</p>
+              <p className="mt-1">Even 1,000–2,000 extra steps after meals can help appetite control, blood sugar, and recovery.</p>
+            </div>
+            <div className="rounded-xl bg-background/60 p-3">
+              <p className="font-medium text-foreground">Your current goal</p>
+              <p className="mt-1">Aim for {stepGoal.toLocaleString()} steps today. You are at {stepPct}% right now.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Quick add meals */}
@@ -322,6 +377,24 @@ function Nutrition() {
         <p className="mb-3 text-sm font-semibold">Last 14 days</p>
         <MiniChart data={last14} dataKey="kcal" label="Calories" color="oklch(0.7 0.1 45)" />
         <MiniChart data={last14} dataKey="steps" label="Steps" color="oklch(0.6 0.08 150)" />
+      </section>
+
+      <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+        <p className="text-sm font-semibold">Useful tips</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className="rounded-xl bg-background/60 p-3 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">Eat around your target</p>
+            <p className="mt-1">Use your calorie target as a guide, not a strict rule. A steady weekly pattern matters more than one perfect day.</p>
+          </div>
+          <div className="rounded-xl bg-background/60 p-3 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">Log as you go</p>
+            <p className="mt-1">Adding meals and steps throughout the day keeps the dashboard accurate and avoids end-of-day guesswork.</p>
+          </div>
+          <div className="rounded-xl bg-background/60 p-3 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">Need medical advice?</p>
+            <p className="mt-1">For health conditions, weight-loss treatment, or nutrition therapy, please ask a doctor or registered dietitian.</p>
+          </div>
+        </div>
       </section>
     </div>
   );
