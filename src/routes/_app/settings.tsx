@@ -48,13 +48,13 @@ function Settings() {
 
   // Sync local form state from profile when it loads
   useEffect(() => {
-    if (!profile) return;
+    if (!mounted || !profile) return;
     setName(profile.name ?? "");
     setAge(profile.age?.toString() ?? "");
     setHeight(profile.heightCm?.toString() ?? "");
     setWeight(profile.weightKg?.toString() ?? "");
     setStepGoal((profile.stepGoal ?? 10000).toString());
-  }, [profile]);
+  }, [mounted, profile]);
 
   const updateProfile = (patch: Partial<UserProfile>) => {
     const base: UserProfile = profile ?? {
@@ -84,12 +84,20 @@ function Settings() {
       toast.error("Add at least your age, height or weight to save.");
       return;
     }
+    const nextAge = age ? parseInt(age, 10) : undefined;
+    const nextHeight = height ? parseInt(height, 10) : undefined;
+    const nextWeight = weight ? parseInt(weight, 10) : undefined;
+    const nextStepGoal = parseInt(stepGoal, 10) || 10000;
     updateProfile({
-      age: age ? parseInt(age, 10) : undefined,
-      heightCm: height ? parseInt(height, 10) : undefined,
-      weightKg: weight ? parseInt(weight, 10) : undefined,
-      stepGoal: parseInt(stepGoal, 10) || 10000,
+      age: nextAge,
+      heightCm: nextHeight,
+      weightKg: nextWeight,
+      stepGoal: nextStepGoal,
     });
+    setAge(nextAge?.toString() ?? "");
+    setHeight(nextHeight?.toString() ?? "");
+    setWeight(nextWeight?.toString() ?? "");
+    setStepGoal(nextStepGoal.toString());
     toast.success("Health profile saved 💚", {
       description: "Your BMI & calorie target will update across the app.",
     });

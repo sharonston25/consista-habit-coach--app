@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Habit, HabitStatus } from "@/lib/habits/types";
 import { Check, Minus, X, Bell, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -47,8 +47,7 @@ export function HabitCard({ habit, status, streak, onCycle, onDelete }: HabitCar
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
       className={cn(
         "group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 shadow-card transition-all",
         bg,
