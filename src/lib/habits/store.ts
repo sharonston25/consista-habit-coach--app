@@ -111,6 +111,9 @@ export function getSettings(): AppSettings {
   });
 }
 export function setSettings(s: AppSettings) {
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.toggle("dark", s.theme === "dark");
+  }
   writeLS(KEYS.settings, s);
   emit();
 }
@@ -162,6 +165,7 @@ export function setNutrition(n: NutritionRecords) {
 export function resetAll() {
   if (typeof window === "undefined") return;
   Object.values(KEYS).forEach((k) => window.localStorage.removeItem(k));
+  document.documentElement.classList.remove("dark");
   emit();
 }
 
