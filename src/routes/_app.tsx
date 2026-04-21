@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
@@ -18,7 +18,6 @@ function AppLayout() {
   const [pinInput, setPinInput] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const loc = useLocation();
 
   useEffect(() => {
     if (!hasVisited()) {
@@ -112,7 +111,7 @@ function AppLayout() {
         </div>
       </header>
 
-      <main key={loc.pathname} className="mx-auto max-w-2xl px-4 py-5 animate-in fade-in duration-200">
+      <main className="mx-auto max-w-2xl px-4 py-5 animate-in fade-in duration-150">
         <Outlet />
       </main>
 

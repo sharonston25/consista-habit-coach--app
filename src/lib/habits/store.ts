@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import type {
   Habit,
   HabitRecords,
@@ -64,15 +64,15 @@ function subscribe(l: Listener) {
  */
 function useStoreSync() {
   const [mounted, setMounted] = useState(false);
-  const [, setTick] = useState(0);
+  const [version, setVersion] = useState(0);
   useEffect(() => {
     setMounted(true);
-    const unsub = subscribe(() => setTick((t) => t + 1));
+    const unsub = subscribe(() => setVersion((t) => t + 1));
     return () => {
       unsub();
     };
   }, []);
-  return mounted;
+  return { mounted, version };
 }
 
 // ----- Habits -----
@@ -172,8 +172,8 @@ export function resetAll() {
 // ----- Hooks -----
 
 export function useHabits() {
-  const mounted = useStoreSync();
-  const habits = mounted ? getHabits() : [];
+  const { mounted, version } = useStoreSync();
+  const habits = useMemo(() => (mounted ? getHabits() : []), [mounted, version]);
   const update = useCallback((h: Habit[]) => setHabits(h), []);
   const addHabit = useCallback((h: Omit<Habit, "id" | "createdAt">) => {
     const next: Habit = { ...h, id: `h-${Date.now()}`, createdAt: new Date().toISOString() };
@@ -192,8 +192,8 @@ export function useHabits() {
 }
 
 export function useRecords() {
-  const mounted = useStoreSync();
-  const records = mounted ? getRecords() : {};
+  const { mounted, version } = useStoreSync();
+  const records = useMemo(() => (mounted ? getRecords() : {}), [mounted, version]);
   const setStatus = useCallback((habitId: string, dateKey: string, status: HabitStatus) => {
     const r = getRecords();
     if (!r[habitId]) r[habitId] = {};
@@ -215,24 +215,25 @@ export function useRecords() {
 }
 
 export function useProfile() {
-  const mounted = useStoreSync();
-  return { profile: mounted ? getProfile() : null, mounted, setProfile };
+  const { mounted, version } = useStoreSync();
+  const profile = useMemo(() => (mounted ? getProfile() : null), [mounted, version]);
+  return { profile, mounted, setProfile };
 }
 
 export function useSettings() {
-  const mounted = useStoreSync();
+  const { mounted, version } = useStoreSync();
+  const fallback = { theme: "light" as const, pinEnabled: false, hasOnboarded: false };
+  const settings = useMemo(() => (mounted ? getSettings() : fallback), [mounted, version]);
   return {
-    settings: mounted
-      ? getSettings()
-      : { theme: "light" as const, pinEnabled: false, hasOnboarded: false },
+    settings,
     mounted,
     setSettings,
   };
 }
 
 export function useNotes() {
-  const mounted = useStoreSync();
-  const notes = mounted ? getNotes() : {};
+  const { mounted, version } = useStoreSync();
+  const notes = useMemo(() => (mounted ? getNotes() : {}), [mounted, version]);
   const setNote = useCallback((dateKey: string, text: string) => {
     const n = getNotes();
     const trimmed = text.trim();
