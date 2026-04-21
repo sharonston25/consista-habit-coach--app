@@ -222,7 +222,7 @@ export function useProfile() {
 
 export function useSettings() {
   const { mounted, version } = useStoreSync();
-  const fallback = { theme: "light" as const, pinEnabled: false, hasOnboarded: false };
+  const fallback: AppSettings = { theme: "light", pinEnabled: false, hasOnboarded: false, pin: undefined };
   const settings = useMemo(() => (mounted ? getSettings() : fallback), [mounted, version]);
   return {
     settings,
@@ -245,8 +245,8 @@ export function useNotes() {
 }
 
 export function useCycle() {
-  const mounted = useStoreSync();
-  const cycle = mounted ? getCycle() : {};
+  const { mounted, version } = useStoreSync();
+  const cycle = useMemo(() => (mounted ? getCycle() : {}), [mounted, version]);
   const upsertCycle = useCallback((dateKey: string, patch: Partial<CycleEntry>) => {
     const c = getCycle();
     const existing = c[dateKey] ?? { date: dateKey, isPeriod: false };
@@ -281,8 +281,8 @@ export function useCycle() {
 }
 
 export function useWellness() {
-  const mounted = useStoreSync();
-  const wellness = mounted ? getWellness() : {};
+  const { mounted, version } = useStoreSync();
+  const wellness = useMemo(() => (mounted ? getWellness() : {}), [mounted, version]);
   const upsertWellness = useCallback((dateKey: string, patch: Partial<WellnessLog>) => {
     const w = getWellness();
     const existing = w[dateKey] ?? { date: dateKey };
@@ -293,8 +293,8 @@ export function useWellness() {
 }
 
 export function useNutrition() {
-  const mounted = useStoreSync();
-  const nutrition = mounted ? getNutrition() : {};
+  const { mounted, version } = useStoreSync();
+  const nutrition = useMemo(() => (mounted ? getNutrition() : {}), [mounted, version]);
   const addMeal = useCallback((dateKey: string, meal: Omit<MealEntry, "id">) => {
     const n = getNutrition();
     const existing = n[dateKey] ?? { date: dateKey, meals: [] };
