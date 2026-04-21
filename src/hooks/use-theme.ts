@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import { useSettings, useProfile } from "@/lib/habits/store";
 
 export function useTheme() {
-  const { settings, setSettings } = useSettings();
+  const { settings, setSettings, mounted } = useSettings();
   useEffect(() => {
+    // Don't touch the class until we've actually loaded settings from localStorage
+    // (otherwise we momentarily strip `.dark` that the inline script in __root applied).
+    if (!mounted) return;
     const root = document.documentElement;
     if (settings.theme === "dark") root.classList.add("dark");
     else root.classList.remove("dark");
-  }, [settings.theme]);
+  }, [settings.theme, mounted]);
   const toggle = () =>
     setSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" });
-  return { theme: settings.theme, toggle };
+  return { theme: settings.theme, toggle, mounted };
 }
 
 export function useGreeting(): { text: string; ready: boolean } {
