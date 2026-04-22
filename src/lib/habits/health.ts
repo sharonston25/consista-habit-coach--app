@@ -62,21 +62,6 @@ export function macroSplit(kcal: number): {
   };
 }
 
-export function macroSplit(kcal: number): {
-  protein: { g: number; kcal: number };
-  carbs: { g: number; kcal: number };
-  fat: { g: number; kcal: number };
-} {
-  const proteinKcal = Math.round(kcal * 0.3);
-  const carbsKcal = Math.round(kcal * 0.45);
-  const fatKcal = kcal - proteinKcal - carbsKcal;
-  return {
-    protein: { kcal: proteinKcal, g: Math.round(proteinKcal / 4) },
-    carbs: { kcal: carbsKcal, g: Math.round(carbsKcal / 4) },
-    fat: { kcal: fatKcal, g: Math.round(fatKcal / 9) },
-  };
-}
-
 /**
  * Recommended daily protein in grams.
  * Goal-based: maintain ~1.6 g/kg, lose 1.8 g/kg (preserves muscle in deficit), gain 2.0 g/kg.
