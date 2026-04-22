@@ -12,6 +12,8 @@ import type {
   WellnessLog,
   NutritionRecords,
   MealEntry,
+  WeightHistory,
+  AchievementsState,
 } from "./types";
 import { PREDEFINED_HABITS } from "./seed";
 
@@ -25,6 +27,8 @@ const KEYS = {
   cycle: "consista:cycle:v1",
   wellness: "consista:wellness:v1",
   nutrition: "consista:nutrition:v1",
+  weight: "consista:weight:v1",
+  achievements: "consista:achievements:v1",
 };
 
 function readLS<T>(key: string, fallback: T): T {
@@ -319,4 +323,73 @@ export function useNutrition() {
     setNutrition(n);
   }, []);
   return { nutrition, mounted, addMeal, removeMeal, setSteps };
+}
+
+// ----- Weight history -----
+export function getWeights(): WeightHistory {
+  return readLS<WeightHistory>(KEYS.weight, {});
+}
+export function setWeights(w: WeightHistory) {
+  writeLS(KEYS.weight, w);
+  emit();
+}
+
+export function useWeights() {
+  const { mounted, version } = useStoreSync();
+  const weights = useMemo(() => (mounted ? getWeights() : {}), [mounted, version]);
+  const logWeight = useCallback((dateKey: string, kg: number) => {
+    const w = getWeights();
+    if (!Number.isFinite(kg) || kg <= 0) return;
+    w[dateKey] = +kg.toFixed(1);
+    setWeights(w);
+  }, []);
+  const removeWeight = useCallback((dateKey: string) => {
+    const w = getWeights();
+    delete w[dateKey];
+    setWeights(w);
+  }, []);
+  return { weights, mounted, logWeight, removeWeight };
+}
+
+// ----- Achievements -----
+const DEFAULT_ACHIEVEMENTS: AchievementsState = {
+  unlocked: {},
+  streakFreezes: 2, // start with 2 freezes
+};
+
+export function getAchievements(): AchievementsState {
+  return readLS<AchievementsState>(KEYS.achievements, DEFAULT_ACHIEVEMENTS);
+}
+export function setAchievementsState(s: AchievementsState) {
+  writeLS(KEYS.achievements, s);
+  emit();
+}
+
+export function useAchievements() {
+  const { mounted, version } = useStoreSync();
+  const state = useMemo(
+    () => (mounted ? getAchievements() : DEFAULT_ACHIEVEMENTS),
+    [mounted, version],
+  );
+  const unlock = useCallback((id: string) => {
+    const s = getAchievements();
+    if (s.unlocked[id]) return false;
+    s.unlocked[id] = new Date().toISOString();
+    setAchievementsState(s);
+    return true;
+  }, []);
+  const useFreeze = useCallback((dateKey: string) => {
+    const s = getAchievements();
+    if (s.streakFreezes <= 0) return false;
+    s.streakFreezes -= 1;
+    s.lastFreezeUsed = dateKey;
+    setAchievementsState(s);
+    return true;
+  }, []);
+  const grantFreeze = useCallback(() => {
+    const s = getAchievements();
+    s.streakFreezes = Math.min(5, s.streakFreezes + 1);
+    setAchievementsState(s);
+  }, []);
+  return { state, mounted, unlock, useFreeze, grantFreeze };
 }
