@@ -37,6 +37,7 @@ export interface UserProfile {
   age?: number;
   heightCm?: number;
   weightKg?: number;
+  targetWeightKg?: number;
   activity?: ActivityLevel;
   goal?: Goal;
   role?: Role;
