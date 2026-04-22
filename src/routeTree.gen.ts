@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiWeeklyReviewRouteImport } from './routes/api/weekly-review'
 import { Route as ApiVisionRouteImport } from './routes/api/vision'
 import { Route as ApiCoachRouteImport } from './routes/api/coach'
 import { Route as AppWellnessRouteImport } from './routes/_app/wellness'
@@ -30,6 +31,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWeeklyReviewRoute = ApiWeeklyReviewRouteImport.update({
+  id: '/api/weekly-review',
+  path: '/api/weekly-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiVisionRoute = ApiVisionRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/_app/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   id:
     | '__root__'
     | '/'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/_app/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   ApiCoachRoute: typeof ApiCoachRoute
   ApiVisionRoute: typeof ApiVisionRoute
+  ApiWeeklyReviewRoute: typeof ApiWeeklyReviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/weekly-review': {
+      id: '/api/weekly-review'
+      path: '/api/weekly-review'
+      fullPath: '/api/weekly-review'
+      preLoaderRoute: typeof ApiWeeklyReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/vision': {
@@ -312,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   ApiCoachRoute: ApiCoachRoute,
   ApiVisionRoute: ApiVisionRoute,
+  ApiWeeklyReviewRoute: ApiWeeklyReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
