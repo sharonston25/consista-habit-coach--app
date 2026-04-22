@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { Apple, Flame, Plus, X, Settings as SettingsIcon } from "lucide-react";
+import { Apple, Flame, Plus, X, Settings as SettingsIcon, Target, CheckCircle2, Circle } from "lucide-react";
 import { toast } from "sonner";
 import { useNutrition, useProfile } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
@@ -11,10 +11,13 @@ import {
   bmiCategory,
   dailyCalories,
   macroSplit,
+  proteinTargetGrams,
   stepsToKcal,
+  weeksToTarget,
   QUICK_MEALS,
 } from "@/lib/habits/health";
 import { ProgressRing } from "@/components/ProgressRing";
+import { PlateScanner } from "@/components/PlateScanner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/nutrition")({
