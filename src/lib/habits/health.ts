@@ -52,6 +52,7 @@ export function macroSplit(kcal: number): {
   carbs: { g: number; kcal: number };
   fat: { g: number; kcal: number };
 } {
+  // 30/45/25 split
   const proteinKcal = Math.round(kcal * 0.3);
   const carbsKcal = Math.round(kcal * 0.45);
   const fatKcal = kcal - proteinKcal - carbsKcal;
