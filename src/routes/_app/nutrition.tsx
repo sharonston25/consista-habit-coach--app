@@ -52,6 +52,19 @@ function Nutrition() {
   const bmiValue = profile ? bmi(profile) : null;
   const cat = bmiCategory(bmiValue);
   const macros = target ? macroSplit(target) : null;
+  const proteinTarget = profile ? proteinTargetGrams(profile) : null;
+  const journey = profile
+    ? weeksToTarget(profile.weightKg, profile.targetWeightKg, profile.goal)
+    : null;
+
+  // Test checklist — confirms saved profile data flows into Nutrition
+  const checklist = [
+    { label: "Age saved", ok: !!profile?.age, value: profile?.age ? `${profile.age} yrs` : "—" },
+    { label: "Height saved", ok: !!profile?.heightCm, value: profile?.heightCm ? `${profile.heightCm} cm` : "—" },
+    { label: "Weight saved", ok: !!profile?.weightKg, value: profile?.weightKg ? `${profile.weightKg} kg` : "—" },
+    { label: "Step goal saved", ok: !!profile?.stepGoal, value: profile?.stepGoal ? `${profile.stepGoal.toLocaleString()}` : "—" },
+    { label: "Calorie target ready", ok: !!target, value: target ? `${target} kcal` : "—" },
+  ];
 
   // 14-day chart
   const last14 = useMemo(() => {
