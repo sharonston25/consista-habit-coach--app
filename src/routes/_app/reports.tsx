@@ -14,6 +14,7 @@ import {
   statusScore,
 } from "@/lib/habits/analytics";
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Award } from "lucide-react";
+import { WeeklyReviewCard } from "@/components/WeeklyReviewCard";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/reports")({
@@ -76,6 +77,9 @@ function Reports() {
           tone="warm"
         />
       </div>
+
+      {/* AI weekly review */}
+      <WeeklyReviewCard />
 
       <div className="inline-flex rounded-xl border border-border/60 bg-card/60 p-1 shadow-soft">
         {(["week", "month", "year"] as const).map((k) => (

@@ -18,6 +18,7 @@ import {
 } from "@/lib/habits/health";
 import { ProgressRing } from "@/components/ProgressRing";
 import { PlateScanner } from "@/components/PlateScanner";
+import { WeightHistoryCard } from "@/components/WeightHistoryCard";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/nutrition")({
@@ -281,6 +282,9 @@ function Nutrition() {
         goal={profile?.goal}
         journey={journey}
       />
+
+      {/* Weight history trend */}
+      <WeightHistoryCard />
 
       <section className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">

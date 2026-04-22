@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiWeeklyReviewRouteImport } from './routes/api/weekly-review'
 import { Route as ApiVisionRouteImport } from './routes/api/vision'
 import { Route as ApiCoachRouteImport } from './routes/api/coach'
 import { Route as AppWellnessRouteImport } from './routes/_app/wellness'
@@ -21,6 +22,7 @@ import { Route as AppPeriodRouteImport } from './routes/_app/period'
 import { Route as AppNutritionRouteImport } from './routes/_app/nutrition'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCoachRouteImport } from './routes/_app/coach'
+import { Route as AppAchievementsRouteImport } from './routes/_app/achievements'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -29,6 +31,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWeeklyReviewRoute = ApiWeeklyReviewRouteImport.update({
+  id: '/api/weekly-review',
+  path: '/api/weekly-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiVisionRoute = ApiVisionRouteImport.update({
@@ -81,9 +88,15 @@ const AppCoachRoute = AppCoachRouteImport.update({
   path: '/coach',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAchievementsRoute = AppAchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/achievements': typeof AppAchievementsRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
   '/nutrition': typeof AppNutritionRoute
@@ -94,9 +107,11 @@ export interface FileRoutesByFullPath {
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/achievements': typeof AppAchievementsRoute
   '/coach': typeof AppCoachRoute
   '/dashboard': typeof AppDashboardRoute
   '/nutrition': typeof AppNutritionRoute
@@ -107,11 +122,13 @@ export interface FileRoutesByTo {
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/_app/achievements': typeof AppAchievementsRoute
   '/_app/coach': typeof AppCoachRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/nutrition': typeof AppNutritionRoute
@@ -122,11 +139,13 @@ export interface FileRoutesById {
   '/_app/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
   '/api/vision': typeof ApiVisionRoute
+  '/api/weekly-review': typeof ApiWeeklyReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/achievements'
     | '/coach'
     | '/dashboard'
     | '/nutrition'
@@ -137,9 +156,11 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/achievements'
     | '/coach'
     | '/dashboard'
     | '/nutrition'
@@ -150,10 +171,12 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/_app/achievements'
     | '/_app/coach'
     | '/_app/dashboard'
     | '/_app/nutrition'
@@ -164,6 +187,7 @@ export interface FileRouteTypes {
     | '/_app/wellness'
     | '/api/coach'
     | '/api/vision'
+    | '/api/weekly-review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +195,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   ApiCoachRoute: typeof ApiCoachRoute
   ApiVisionRoute: typeof ApiVisionRoute
+  ApiWeeklyReviewRoute: typeof ApiWeeklyReviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -187,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/weekly-review': {
+      id: '/api/weekly-review'
+      path: '/api/weekly-review'
+      fullPath: '/api/weekly-review'
+      preLoaderRoute: typeof ApiWeeklyReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/vision': {
@@ -259,10 +291,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCoachRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/achievements': {
+      id: '/_app/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AppAchievementsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAchievementsRoute: typeof AppAchievementsRoute
   AppCoachRoute: typeof AppCoachRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppNutritionRoute: typeof AppNutritionRoute
@@ -274,6 +314,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAchievementsRoute: AppAchievementsRoute,
   AppCoachRoute: AppCoachRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppNutritionRoute: AppNutritionRoute,
@@ -291,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   ApiCoachRoute: ApiCoachRoute,
   ApiVisionRoute: ApiVisionRoute,
+  ApiWeeklyReviewRoute: ApiWeeklyReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

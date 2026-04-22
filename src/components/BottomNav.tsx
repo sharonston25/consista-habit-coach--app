@@ -1,13 +1,13 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   Home,
-  Calendar,
   BarChart3,
   Sparkles,
   Settings as SettingsIcon,
   Heart,
   Dumbbell,
   Apple,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/lib/habits/store";
@@ -27,7 +27,7 @@ export function BottomNav() {
     { to: "/dashboard" as const, label: "Today", icon: Home },
     { to: "/nutrition" as const, label: "Nutrition", icon: Apple },
     ...(middleItem ? [middleItem] : []),
-    { to: "/weekly" as const, label: "Weekly", icon: Calendar },
+    { to: "/achievements" as const, label: "Awards", icon: Trophy },
     { to: "/reports" as const, label: "Reports", icon: BarChart3 },
     { to: "/coach" as const, label: "Coach", icon: Sparkles },
     { to: "/settings" as const, label: "Settings", icon: SettingsIcon },
