@@ -179,6 +179,31 @@ function Dashboard() {
         </div>
       </section>
 
+      {/* Achievements CTA */}
+      {hMounted && (
+        <Link
+          to="/achievements"
+          className="flex items-center justify-between rounded-2xl border border-border/60 bg-gradient-to-r from-primary/5 to-accent/10 p-4 shadow-soft transition-all hover:border-primary/40"
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.78_0.13_45)] to-[oklch(0.65_0.18_25)] text-white shadow-glow">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">
+                {unlockedCount} badge{unlockedCount !== 1 ? "s" : ""} · {wStreak}-day streak
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {milestone
+                  ? `${milestone - wStreak} day${milestone - wStreak !== 1 ? "s" : ""} to ${milestone}-day milestone`
+                  : "Legendary streak — keep it up!"}
+              </p>
+            </div>
+          </div>
+          <span className="text-muted-foreground">→</span>
+        </Link>
+      )}
+
       {/* Role-aware tip — calm gradient */}
       {hMounted && (
         <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
