@@ -94,3 +94,22 @@ export interface NutritionLog {
 }
 
 export type NutritionRecords = Record<string, NutritionLog>;
+
+// Weight history: dateKey -> kg
+export type WeightHistory = Record<string, number>;
+
+// Achievements
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  category: "streak" | "habits" | "nutrition" | "wellness" | "milestone";
+  unlockedAt?: string; // ISO when first earned
+}
+
+export interface AchievementsState {
+  unlocked: Record<string, string>; // id -> ISO date
+  streakFreezes: number; // available freezes (saves a missed day)
+  lastFreezeUsed?: string; // dateKey
+}
