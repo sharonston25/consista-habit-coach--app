@@ -1,6 +1,6 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import { ConsistaLogo } from "@/components/ConsistaLogo";
 import { useTheme } from "@/hooks/use-theme";
@@ -18,6 +18,7 @@ function AppLayout() {
   const [pinInput, setPinInput] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const loc = useLocation();
 
   useEffect(() => {
     if (!hasVisited()) {
@@ -111,8 +112,18 @@ function AppLayout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-5 animate-in fade-in duration-150">
-        <Outlet />
+      <main className="mx-auto max-w-2xl px-4 py-5">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={loc.pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <BottomNav />

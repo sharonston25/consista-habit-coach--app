@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { Apple, Flame, Plus, X, Settings as SettingsIcon } from "lucide-react";
+import { Apple, Flame, Plus, X, Settings as SettingsIcon, Target, CheckCircle2, Circle } from "lucide-react";
 import { toast } from "sonner";
 import { useNutrition, useProfile } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
@@ -11,10 +11,13 @@ import {
   bmiCategory,
   dailyCalories,
   macroSplit,
+  proteinTargetGrams,
   stepsToKcal,
+  weeksToTarget,
   QUICK_MEALS,
 } from "@/lib/habits/health";
 import { ProgressRing } from "@/components/ProgressRing";
+import { PlateScanner } from "@/components/PlateScanner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/nutrition")({
@@ -49,6 +52,19 @@ function Nutrition() {
   const bmiValue = profile ? bmi(profile) : null;
   const cat = bmiCategory(bmiValue);
   const macros = target ? macroSplit(target) : null;
+  const proteinTarget = profile ? proteinTargetGrams(profile) : null;
+  const journey = profile
+    ? weeksToTarget(profile.weightKg, profile.targetWeightKg, profile.goal)
+    : null;
+
+  // Test checklist — confirms saved profile data flows into Nutrition
+  const checklist = [
+    { label: "Age saved", ok: !!profile?.age, value: profile?.age ? `${profile.age} yrs` : "—" },
+    { label: "Height saved", ok: !!profile?.heightCm, value: profile?.heightCm ? `${profile.heightCm} cm` : "—" },
+    { label: "Weight saved", ok: !!profile?.weightKg, value: profile?.weightKg ? `${profile.weightKg} kg` : "—" },
+    { label: "Step goal saved", ok: !!profile?.stepGoal, value: profile?.stepGoal ? `${profile.stepGoal.toLocaleString()}` : "—" },
+    { label: "Calorie target ready", ok: !!target, value: target ? `${target} kcal` : "—" },
+  ];
 
   // 14-day chart
   const last14 = useMemo(() => {
@@ -236,17 +252,35 @@ function Nutrition() {
 
         {macros && (
           <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Suggested macros
-            </p>
+            <div className="flex items-baseline justify-between">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Suggested macros
+              </p>
+              {proteinTarget && (
+                <p className="text-[10px] font-semibold text-primary">
+                  Protein goal · {proteinTarget}g
+                </p>
+              )}
+            </div>
             <div className="mt-3 space-y-2">
               <MacroBar label="Protein" g={macros.protein.g} kcal={macros.protein.kcal} pct={30} color="oklch(0.7 0.1 45)" />
               <MacroBar label="Carbs" g={macros.carbs.g} kcal={macros.carbs.kcal} pct={45} color="oklch(0.7 0.08 220)" />
               <MacroBar label="Fat" g={macros.fat.g} kcal={macros.fat.kcal} pct={25} color="oklch(0.78 0.1 70)" />
             </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+              Protein supports muscle, satiety and recovery. Aim for ~{proteinTarget ?? 100}g across your meals — eggs, fish, chicken, tofu, lentils, dairy, or a shake.
+            </p>
           </div>
         )}
       </section>
+
+      {/* Weight goal & timeline */}
+      <WeightGoalCard
+        currentKg={profile?.weightKg}
+        targetKg={profile?.targetWeightKg}
+        goal={profile?.goal}
+        journey={journey}
+      />
 
       <section className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
@@ -297,6 +331,11 @@ function Nutrition() {
           </div>
         </div>
       </section>
+
+      {/* AI plate scanner */}
+      <PlateScanner
+        onLog={(meal) => addMeal(todayKey, meal)}
+      />
 
       {/* Quick add meals */}
       <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
@@ -379,6 +418,42 @@ function Nutrition() {
         <MiniChart data={last14} dataKey="steps" label="Steps" color="oklch(0.6 0.08 150)" />
       </section>
 
+      {/* In-app test checklist */}
+      <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold">Saved profile checklist</p>
+          <Link to="/settings" className="text-xs font-medium text-primary hover:underline">
+            Open settings
+          </Link>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          Confirms data saved in Settings shows up here and survives navigation & refresh.
+        </p>
+        <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          {checklist.map((c) => (
+            <li
+              key={c.label}
+              className={cn(
+                "flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs",
+                c.ok
+                  ? "border-success/30 bg-success/10 text-foreground"
+                  : "border-border bg-background/50 text-muted-foreground",
+              )}
+            >
+              <span className="flex items-center gap-2">
+                {c.ok ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                ) : (
+                  <Circle className="h-3.5 w-3.5" />
+                )}
+                {c.label}
+              </span>
+              <span className="font-semibold">{c.value}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
         <p className="text-sm font-semibold">Useful tips</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -396,6 +471,116 @@ function Nutrition() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function WeightGoalCard({
+  currentKg,
+  targetKg,
+  goal,
+  journey,
+}: {
+  currentKg: number | undefined;
+  targetKg: number | undefined;
+  goal: "lose" | "maintain" | "gain" | undefined;
+  journey: { weeks: number; kgPerWeek: number; deltaKg: number } | null;
+}) {
+  const { profile, setProfile } = useProfile();
+  const [draft, setDraft] = useState<string>(targetKg?.toString() ?? "");
+
+  const save = () => {
+    const v = parseFloat(draft);
+    if (!Number.isFinite(v) || v < 30 || v > 250) {
+      toast.error("Enter a realistic target weight (30–250 kg).");
+      return;
+    }
+    if (!profile) {
+      toast.error("Please complete your profile in Settings first.");
+      return;
+    }
+    setProfile({ ...profile, targetWeightKg: +v.toFixed(1) });
+    toast.success(`Target set: ${v} kg`);
+  };
+
+  const direction =
+    journey && journey.deltaKg < 0 ? "lose" : journey && journey.deltaKg > 0 ? "gain" : "maintain";
+  const goalMatchesDirection =
+    !journey ||
+    (goal === "lose" && direction === "lose") ||
+    (goal === "gain" && direction === "gain") ||
+    (goal === "maintain" && direction === "maintain");
+
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+      <div className="mb-3 flex items-center gap-2">
+        <Target className="h-4 w-4 text-primary" />
+        <p className="text-sm font-semibold">Weight goal & timeline</p>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Pick a target weight. We estimate a realistic timeline using your goal calorie delta (≈ 7,700 kcal per kg).
+      </p>
+
+      <div className="mt-3 flex flex-wrap items-end gap-2">
+        <label className="flex flex-col gap-1">
+          <span className="text-[10px] font-medium text-muted-foreground">Current</span>
+          <div className="rounded-xl border border-border bg-background/40 px-3 py-2 text-sm font-semibold">
+            {currentKg ? `${currentKg} kg` : "—"}
+          </div>
+        </label>
+        <label className="flex flex-1 flex-col gap-1">
+          <span className="text-[10px] font-medium text-muted-foreground">Target</span>
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value.replace(/[^\d.]/g, ""))}
+            inputMode="decimal"
+            placeholder="e.g. 68"
+            className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-primary/20"
+          />
+        </label>
+        <button
+          onClick={save}
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft hover:scale-[1.02]"
+        >
+          Save
+        </button>
+      </div>
+
+      {journey && (
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <Stat
+            label={journey.deltaKg < 0 ? "To lose" : "To gain"}
+            value={`${Math.abs(journey.deltaKg)} kg`}
+          />
+          <Stat label="Weekly pace" value={`${journey.kgPerWeek} kg/wk`} />
+          <Stat
+            label="Estimated time"
+            value={journey.weeks > 0 ? `${journey.weeks} wk` : "—"}
+          />
+        </div>
+      )}
+
+      {journey && !goalMatchesDirection && (
+        <p className="mt-3 rounded-xl bg-warning/15 px-3 py-2 text-[11px] text-warning-foreground">
+          Heads up — your goal in Settings is set to <b>{goal}</b> but your target weight requires you to{" "}
+          <b>{direction}</b>. Update your goal so calories & timeline match.
+        </p>
+      )}
+
+      {!journey && currentKg && (
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          Add a target weight to see how many weeks it should realistically take.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-background/40 px-3 py-2">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="text-sm font-semibold">{value}</p>
     </div>
   );
 }

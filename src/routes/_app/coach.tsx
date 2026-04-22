@@ -203,17 +203,30 @@ function Coach() {
     "What habit should I focus on this week?",
   ];
 
+  const profileMounted = useProfile().mounted;
+  const displayName = profile?.name?.trim() || (profileMounted ? "there" : "");
+
   return (
     <div className="flex h-[calc(100vh-9rem)] flex-col">
       <div className="mb-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Coach</h1>
-          <p className="text-sm text-muted-foreground">Ask anything. I know your habits.</p>
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <span>
+              Hi{" "}
+              {displayName ? (
+                <span className="text-primary">{displayName}</span>
+              ) : (
+                <span className="inline-block h-5 w-16 animate-pulse rounded bg-muted/60 align-middle" />
+              )}
+            </span>
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">Your calm habit coach. Ask anything.</p>
         </div>
         {messages.length > 0 && (
           <button
             onClick={clearChat}
-            className="rounded-xl border border-border bg-card/60 p-2 text-muted-foreground hover:text-destructive"
+            className="rounded-xl border border-border/60 bg-card/60 p-2 text-muted-foreground hover:text-destructive"
             aria-label="Clear chat"
           >
             <Trash2 className="h-4 w-4" />
@@ -247,7 +260,7 @@ function Coach() {
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-semibold">Hi {profile?.name ?? "there"} 👋</p>
+              <p className="font-semibold">Hi {displayName || "there"} 👋</p>
               <p className="mt-1 max-w-xs text-sm text-muted-foreground">
                 I'm your habit coach. Ask me about consistency, motivation, or anything else.
               </p>

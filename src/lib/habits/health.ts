@@ -62,6 +62,35 @@ export function macroSplit(kcal: number): {
   };
 }
 
+/**
+ * Recommended daily protein in grams.
+ * Goal-based: maintain ~1.6 g/kg, lose 1.8 g/kg (preserves muscle in deficit), gain 2.0 g/kg.
+ */
+export function proteinTargetGrams(profile: UserProfile): number | null {
+  if (!profile.weightKg) return null;
+  const perKg = profile.goal === "lose" ? 1.8 : profile.goal === "gain" ? 2.0 : 1.6;
+  return Math.round(profile.weightKg * perKg);
+}
+
+/**
+ * Estimate weeks to reach a target weight given the user's goal calorie delta.
+ * 7700 kcal ≈ 1 kg of body fat. Returns null if no target/no current weight.
+ */
+export function weeksToTarget(
+  currentKg: number | undefined,
+  targetKg: number | undefined,
+  goal: Goal | undefined,
+): { weeks: number; kgPerWeek: number; deltaKg: number } | null {
+  if (!currentKg || !targetKg || currentKg === targetKg) return null;
+  const deltaKg = +(targetKg - currentKg).toFixed(1);
+  const dailyDelta = goal === "lose" ? -400 : goal === "gain" ? 350 : 0;
+  if (dailyDelta === 0) return { weeks: 0, kgPerWeek: 0, deltaKg };
+  const kcalPerWeek = Math.abs(dailyDelta) * 7;
+  const kgPerWeek = +(kcalPerWeek / 7700).toFixed(2);
+  const weeks = Math.max(1, Math.ceil(Math.abs(deltaKg) / kgPerWeek));
+  return { weeks, kgPerWeek, deltaKg };
+}
+
 export const STEP_KCAL_PER_STEP = 0.04; // ~40kcal per 1000 steps for a ~70kg adult
 
 export function stepsToKcal(steps: number): number {
