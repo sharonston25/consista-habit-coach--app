@@ -252,17 +252,35 @@ function Nutrition() {
 
         {macros && (
           <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Suggested macros
-            </p>
+            <div className="flex items-baseline justify-between">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Suggested macros
+              </p>
+              {proteinTarget && (
+                <p className="text-[10px] font-semibold text-primary">
+                  Protein goal · {proteinTarget}g
+                </p>
+              )}
+            </div>
             <div className="mt-3 space-y-2">
               <MacroBar label="Protein" g={macros.protein.g} kcal={macros.protein.kcal} pct={30} color="oklch(0.7 0.1 45)" />
               <MacroBar label="Carbs" g={macros.carbs.g} kcal={macros.carbs.kcal} pct={45} color="oklch(0.7 0.08 220)" />
               <MacroBar label="Fat" g={macros.fat.g} kcal={macros.fat.kcal} pct={25} color="oklch(0.78 0.1 70)" />
             </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+              Protein supports muscle, satiety and recovery. Aim for ~{proteinTarget ?? 100}g across your meals — eggs, fish, chicken, tofu, lentils, dairy, or a shake.
+            </p>
           </div>
         )}
       </section>
+
+      {/* Weight goal & timeline */}
+      <WeightGoalCard
+        currentKg={profile?.weightKg}
+        targetKg={profile?.targetWeightKg}
+        goal={profile?.goal}
+        journey={journey}
+      />
 
       <section className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
