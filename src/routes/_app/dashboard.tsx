@@ -1,10 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { format, isToday } from "date-fns";
+import { toast } from "sonner";
 import { ProgressRing } from "@/components/ProgressRing";
 import { HabitCard } from "@/components/HabitCard";
-import { useHabits, useRecords, useNotes, useProfile, useNutrition } from "@/lib/habits/store";
+import {
+  useHabits,
+  useRecords,
+  useNotes,
+  useProfile,
+  useNutrition,
+  useWellness,
+  useAchievements,
+} from "@/lib/habits/store";
 import {
   dateKey,
   dayCompletion,
@@ -13,6 +22,7 @@ import {
   weeklyStreak,
   dailyIndex,
 } from "@/lib/habits/analytics";
+import { evaluateAchievements, findAchievement, nextMilestone } from "@/lib/habits/achievements";
 import { QUOTES, FUN_FACTS, STRESS_TIPS } from "@/lib/habits/seed";
 import { roleTip, dailyCalories, stepsToKcal } from "@/lib/habits/health";
 import { useGreeting } from "@/hooks/use-theme";
@@ -29,6 +39,7 @@ import {
   Dumbbell,
   Apple,
   Footprints,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +67,8 @@ function Dashboard() {
   const { notes, setNote } = useNotes();
   const { profile } = useProfile();
   const { nutrition } = useNutrition();
+  const { wellness } = useWellness();
+  const { state: achState, unlock } = useAchievements();
   const { text: greeting, ready: greetingReady } = useGreeting();
   const [showAdd, setShowAdd] = useState(false);
 
@@ -64,6 +77,32 @@ function Dashboard() {
   const completion = Math.round(dayCompletion(habits, records, today) * 100);
   const wStreak = weeklyStreak(habits, records, today);
   const week = last7Days(today);
+
+  // Evaluate achievements when data changes
+  useEffect(() => {
+    if (!hMounted) return;
+    const newly = evaluateAchievements({
+      habits,
+      records,
+      nutrition,
+      wellness,
+      state: achState,
+    });
+    newly.forEach((id) => {
+      if (unlock(id)) {
+        const a = findAchievement(id);
+        if (a) {
+          toast.success(`${a.emoji} Achievement unlocked!`, {
+            description: a.title,
+          });
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hMounted, records, nutrition, wellness]);
+
+  const milestone = nextMilestone(wStreak);
+  const unlockedCount = Object.keys(achState.unlocked).length;
 
   const doneCount = habits.filter((h) => records[h.id]?.[todayKey] === "done").length;
   const partialCount = habits.filter((h) => records[h.id]?.[todayKey] === "partial").length;
