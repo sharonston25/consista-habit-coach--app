@@ -260,7 +260,7 @@ function Coach() {
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-semibold">Hi {profile?.name ?? "there"} 👋</p>
+              <p className="font-semibold">Hi {displayName || "there"} 👋</p>
               <p className="mt-1 max-w-xs text-sm text-muted-foreground">
                 I'm your habit coach. Ask me about consistency, motivation, or anything else.
               </p>

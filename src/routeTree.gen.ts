@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiVisionRouteImport } from './routes/api/vision'
 import { Route as ApiCoachRouteImport } from './routes/api/coach'
 import { Route as AppWellnessRouteImport } from './routes/_app/wellness'
 import { Route as AppWeeklyRouteImport } from './routes/_app/weekly'
@@ -28,6 +29,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVisionRoute = ApiVisionRouteImport.update({
+  id: '/api/vision',
+  path: '/api/vision',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCoachRoute = ApiCoachRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/weekly': typeof AppWeeklyRoute
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
+  '/api/vision': typeof ApiVisionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/weekly': typeof AppWeeklyRoute
   '/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
+  '/api/vision': typeof ApiVisionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_app/weekly': typeof AppWeeklyRoute
   '/_app/wellness': typeof AppWellnessRoute
   '/api/coach': typeof ApiCoachRoute
+  '/api/vision': typeof ApiVisionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/weekly'
     | '/wellness'
     | '/api/coach'
+    | '/api/vision'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/weekly'
     | '/wellness'
     | '/api/coach'
+    | '/api/vision'
   id:
     | '__root__'
     | '/'
@@ -152,12 +163,14 @@ export interface FileRouteTypes {
     | '/_app/weekly'
     | '/_app/wellness'
     | '/api/coach'
+    | '/api/vision'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   ApiCoachRoute: typeof ApiCoachRoute
+  ApiVisionRoute: typeof ApiVisionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vision': {
+      id: '/api/vision'
+      path: '/api/vision'
+      fullPath: '/api/vision'
+      preLoaderRoute: typeof ApiVisionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/coach': {
@@ -270,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   ApiCoachRoute: ApiCoachRoute,
+  ApiVisionRoute: ApiVisionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
