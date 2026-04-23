@@ -40,7 +40,7 @@ export function on<E extends EventName>(event: E, handler: Handler<E>): () => vo
 }
 
 export function emit<E extends EventName>(event: E, payload: AppEvents[E]): void {
-  const set = handlers[event] as Set<Handler<E>> | undefined;
+  const set = handlers.get(event);
   if (!set) return;
   set.forEach((h) => {
     try {
