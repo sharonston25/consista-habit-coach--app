@@ -16,6 +16,7 @@ import type {
   AchievementsState,
 } from "./types";
 import { PREDEFINED_HABITS } from "./seed";
+import { emit as emitEvent } from "@/lib/platform/events";
 
 const KEYS = {
   habits: "consista:habits:v1",
