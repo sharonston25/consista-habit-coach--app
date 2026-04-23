@@ -114,6 +114,17 @@ function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hMounted, records, nutrition, wellness]);
 
+  // Milestone celebration on streak thresholds
+  useEffect(() => {
+    if (!hMounted) return;
+    const ms = checkMilestone(wStreak, achState.lastMilestoneCelebrated);
+    if (ms) {
+      setMilestoneToShow(ms);
+      markMilestone(ms);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hMounted, wStreak]);
+
   const milestone = nextMilestone(wStreak);
   const unlockedCount = Object.keys(achState.unlocked).length;
 
