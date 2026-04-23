@@ -71,6 +71,9 @@ export interface WellnessLog {
   date: string;
   energy?: number;
   sleepHours?: number;
+  bedtime?: string; // HH:mm
+  wakeTime?: string; // HH:mm
+  sleepQuality?: number; // 1-5
   workoutMinutes?: number;
   waterCups?: number;
   mood?: CycleMood;
@@ -112,4 +115,5 @@ export interface AchievementsState {
   unlocked: Record<string, string>; // id -> ISO date
   streakFreezes: number; // available freezes (saves a missed day)
   lastFreezeUsed?: string; // dateKey
+  lastMilestoneCelebrated?: number; // highest streak milestone already celebrated
 }
