@@ -468,6 +468,8 @@ function Settings() {
         </button>
       </Card>
 
+      <FeatureFlagsPanel />
+
       {/* Danger zone */}
       <Card icon={Trash2} title="Danger zone">
         <button
