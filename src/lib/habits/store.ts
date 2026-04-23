@@ -317,6 +317,7 @@ export function useNutrition() {
       meals: [...existing.meals, { ...meal, id: `m-${Date.now()}` }],
     };
     setNutrition(n);
+    emitEvent("meal:added", { dateKey, kcal: meal.kcal });
   }, []);
   const removeMeal = useCallback((dateKey: string, mealId: string) => {
     const n = getNutrition();
