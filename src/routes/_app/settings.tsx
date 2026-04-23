@@ -28,6 +28,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
 
 export const Route = createFileRoute("/_app/settings")({
   component: Settings,
@@ -466,6 +467,8 @@ function Settings() {
           <Sparkles className="h-4 w-4 text-primary" /> Replay onboarding tour
         </button>
       </Card>
+
+      <FeatureFlagsPanel />
 
       {/* Danger zone */}
       <Card icon={Trash2} title="Danger zone">

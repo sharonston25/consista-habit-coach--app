@@ -16,6 +16,7 @@ import type {
   AchievementsState,
 } from "./types";
 import { PREDEFINED_HABITS } from "./seed";
+import { emit as emitEvent } from "@/lib/platform/events";
 
 const KEYS = {
   habits: "consista:habits:v1",
@@ -182,12 +183,14 @@ export function useHabits() {
   const addHabit = useCallback((h: Omit<Habit, "id" | "createdAt">) => {
     const next: Habit = { ...h, id: `h-${Date.now()}`, createdAt: new Date().toISOString() };
     setHabits([...getHabits(), next]);
+    emitEvent("habit:created", { habitId: next.id });
   }, []);
   const removeHabit = useCallback((id: string) => {
     setHabits(getHabits().filter((h) => h.id !== id));
     const recs = getRecords();
     delete recs[id];
     setRecords(recs);
+    emitEvent("habit:deleted", { habitId: id });
   }, []);
   const updateHabit = useCallback((id: string, patch: Partial<Habit>) => {
     setHabits(getHabits().map((h) => (h.id === id ? { ...h, ...patch } : h)));
@@ -204,6 +207,9 @@ export function useRecords() {
     if (status === "empty") delete r[habitId][dateKey];
     else r[habitId][dateKey] = status;
     setRecords(r);
+    if (status === "done" || status === "partial") {
+      emitEvent("habit:completed", { habitId, dateKey, status });
+    }
   }, []);
   const cycleStatus = useCallback((habitId: string, dateKey: string) => {
     const r = getRecords();
@@ -214,6 +220,9 @@ export function useRecords() {
     if (next === "empty") delete r[habitId][dateKey];
     else r[habitId][dateKey] = next;
     setRecords(r);
+    if (next === "done" || next === "partial") {
+      emitEvent("habit:completed", { habitId, dateKey, status: next });
+    }
   }, []);
   return { records, mounted, setStatus, cycleStatus };
 }
@@ -308,6 +317,7 @@ export function useNutrition() {
       meals: [...existing.meals, { ...meal, id: `m-${Date.now()}` }],
     };
     setNutrition(n);
+    emitEvent("meal:added", { dateKey, kcal: meal.kcal });
   }, []);
   const removeMeal = useCallback((dateKey: string, mealId: string) => {
     const n = getNutrition();
@@ -342,6 +352,7 @@ export function useWeights() {
     if (!Number.isFinite(kg) || kg <= 0) return;
     w[dateKey] = +kg.toFixed(1);
     setWeights(w);
+    emitEvent("weight:logged", { dateKey, kg: w[dateKey] });
   }, []);
   const removeWeight = useCallback((dateKey: string) => {
     const w = getWeights();
@@ -376,6 +387,7 @@ export function useAchievements() {
     if (s.unlocked[id]) return false;
     s.unlocked[id] = new Date().toISOString();
     setAchievementsState(s);
+    emitEvent("achievement:unlocked", { id });
     return true;
   }, []);
   const useFreeze = useCallback((dateKey: string) => {
@@ -396,6 +408,7 @@ export function useAchievements() {
     if ((s.lastMilestoneCelebrated ?? 0) >= streak) return;
     s.lastMilestoneCelebrated = streak;
     setAchievementsState(s);
+    emitEvent("milestone:reached", { streak });
   }, []);
   return { state, mounted, unlock, useFreeze, grantFreeze, markMilestone };
 }
