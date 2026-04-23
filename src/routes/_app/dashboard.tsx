@@ -26,6 +26,8 @@ import { evaluateAchievements, findAchievement, nextMilestone } from "@/lib/habi
 import { QUOTES, FUN_FACTS, STRESS_TIPS } from "@/lib/habits/seed";
 import { roleTip, dailyCalories, stepsToKcal } from "@/lib/habits/health";
 import { useGreeting } from "@/hooks/use-theme";
+import { OnboardingTour, shouldShowTour } from "@/components/OnboardingTour";
+import { MilestoneCelebration, checkMilestone } from "@/components/MilestoneCelebration";
 import type { HabitColor } from "@/lib/habits/types";
 import {
   Plus,
@@ -68,9 +70,20 @@ function Dashboard() {
   const { profile } = useProfile();
   const { nutrition } = useNutrition();
   const { wellness } = useWellness();
-  const { state: achState, unlock } = useAchievements();
+  const { state: achState, unlock, markMilestone } = useAchievements();
   const { text: greeting, ready: greetingReady } = useGreeting();
   const [showAdd, setShowAdd] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [milestoneToShow, setMilestoneToShow] = useState<number | null>(null);
+
+  // First-visit tour
+  useEffect(() => {
+    if (!hMounted) return;
+    if (shouldShowTour()) {
+      const t = setTimeout(() => setShowTour(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [hMounted]);
 
   const today = useMemo(() => new Date(), []);
   const todayKey = dateKey(today);
