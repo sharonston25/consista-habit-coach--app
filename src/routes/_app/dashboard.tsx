@@ -26,6 +26,8 @@ import { evaluateAchievements, findAchievement, nextMilestone } from "@/lib/habi
 import { QUOTES, FUN_FACTS, STRESS_TIPS } from "@/lib/habits/seed";
 import { roleTip, dailyCalories, stepsToKcal } from "@/lib/habits/health";
 import { useGreeting } from "@/hooks/use-theme";
+import { OnboardingTour, shouldShowTour } from "@/components/OnboardingTour";
+import { MilestoneCelebration, checkMilestone } from "@/components/MilestoneCelebration";
 import type { HabitColor } from "@/lib/habits/types";
 import {
   Plus,
@@ -68,9 +70,20 @@ function Dashboard() {
   const { profile } = useProfile();
   const { nutrition } = useNutrition();
   const { wellness } = useWellness();
-  const { state: achState, unlock } = useAchievements();
+  const { state: achState, unlock, markMilestone } = useAchievements();
   const { text: greeting, ready: greetingReady } = useGreeting();
   const [showAdd, setShowAdd] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [milestoneToShow, setMilestoneToShow] = useState<number | null>(null);
+
+  // First-visit tour
+  useEffect(() => {
+    if (!hMounted) return;
+    if (shouldShowTour()) {
+      const t = setTimeout(() => setShowTour(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [hMounted]);
 
   const today = useMemo(() => new Date(), []);
   const todayKey = dateKey(today);
@@ -100,6 +113,17 @@ function Dashboard() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hMounted, records, nutrition, wellness]);
+
+  // Milestone celebration on streak thresholds
+  useEffect(() => {
+    if (!hMounted) return;
+    const ms = checkMilestone(wStreak, achState.lastMilestoneCelebrated);
+    if (ms) {
+      setMilestoneToShow(ms);
+      markMilestone(ms);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hMounted, wStreak]);
 
   const milestone = nextMilestone(wStreak);
   const unlockedCount = Object.keys(achState.unlocked).length;
@@ -422,6 +446,14 @@ function Dashboard() {
       <p className="pt-1 text-center text-xs text-muted-foreground">
         Tap a habit icon to cycle: <span className="font-semibold">empty → done → partial → missed</span>.
       </p>
+
+      {/* Onboarding tour for first-time users */}
+      {showTour && <OnboardingTour onClose={() => setShowTour(false)} />}
+
+      {/* Milestone celebration */}
+      {milestoneToShow !== null && (
+        <MilestoneCelebration streak={milestoneToShow} onClose={() => setMilestoneToShow(null)} />
+      )}
     </div>
   );
 }
