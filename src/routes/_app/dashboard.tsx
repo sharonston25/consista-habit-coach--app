@@ -446,6 +446,14 @@ function Dashboard() {
       <p className="pt-1 text-center text-xs text-muted-foreground">
         Tap a habit icon to cycle: <span className="font-semibold">empty → done → partial → missed</span>.
       </p>
+
+      {/* Onboarding tour for first-time users */}
+      {showTour && <OnboardingTour onClose={() => setShowTour(false)} />}
+
+      {/* Milestone celebration */}
+      {milestoneToShow !== null && (
+        <MilestoneCelebration streak={milestoneToShow} onClose={() => setMilestoneToShow(null)} />
+      )}
     </div>
   );
 }
