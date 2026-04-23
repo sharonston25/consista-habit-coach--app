@@ -352,6 +352,7 @@ export function useWeights() {
     if (!Number.isFinite(kg) || kg <= 0) return;
     w[dateKey] = +kg.toFixed(1);
     setWeights(w);
+    emitEvent("weight:logged", { dateKey, kg: w[dateKey] });
   }, []);
   const removeWeight = useCallback((dateKey: string) => {
     const w = getWeights();
@@ -386,6 +387,7 @@ export function useAchievements() {
     if (s.unlocked[id]) return false;
     s.unlocked[id] = new Date().toISOString();
     setAchievementsState(s);
+    emitEvent("achievement:unlocked", { id });
     return true;
   }, []);
   const useFreeze = useCallback((dateKey: string) => {
@@ -406,6 +408,7 @@ export function useAchievements() {
     if ((s.lastMilestoneCelebrated ?? 0) >= streak) return;
     s.lastMilestoneCelebrated = streak;
     setAchievementsState(s);
+    emitEvent("milestone:reached", { streak });
   }, []);
   return { state, mounted, unlock, useFreeze, grantFreeze, markMilestone };
 }
