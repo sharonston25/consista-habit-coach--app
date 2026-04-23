@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { format, subDays, eachDayOfInterval } from "date-fns";
-import { Dumbbell, Moon, Droplet, Zap, Heart } from "lucide-react";
+import { Dumbbell, Moon, Zap, Heart } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { toast } from "sonner";
 import { useWellness } from "@/lib/habits/store";
 import { dateKey } from "@/lib/habits/analytics";
+import { WaterTracker } from "@/components/WaterTracker";
+import { SleepLogger } from "@/components/SleepLogger";
 import type { CycleMood } from "@/lib/habits/types";
 import { cn } from "@/lib/utils";
 
@@ -67,17 +69,23 @@ function Wellness() {
         </p>
       </div>
 
+      {/* Water + Sleep — featured trackers */}
+      <section className="grid gap-3 sm:grid-cols-2">
+        <WaterTracker
+          cups={log.waterCups ?? 0}
+          onChange={(v) => upsertWellness(todayKey, { waterCups: v })}
+        />
+        <SleepLogger
+          hours={log.sleepHours}
+          bedtime={log.bedtime}
+          wakeTime={log.wakeTime}
+          quality={log.sleepQuality}
+          onChange={(patch) => upsertWellness(todayKey, patch)}
+        />
+      </section>
+
       {/* Quick numeric inputs */}
       <section className="grid gap-3 sm:grid-cols-2">
-        <NumberCard
-          icon={Moon}
-          label="Sleep (hours)"
-          value={log.sleepHours}
-          step={0.5}
-          max={12}
-          onChange={(v) => upsertWellness(todayKey, { sleepHours: v })}
-          accent="bg-[oklch(0.6_0.08_255_/_0.15)] text-[oklch(0.45_0.1_260)] dark:text-[oklch(0.78_0.09_255)]"
-        />
         <NumberCard
           icon={Dumbbell}
           label="Workout (min)"
@@ -86,15 +94,6 @@ function Wellness() {
           max={240}
           onChange={(v) => upsertWellness(todayKey, { workoutMinutes: v })}
           accent="bg-[oklch(0.7_0.1_45_/_0.18)] text-[oklch(0.5_0.12_45)] dark:text-[oklch(0.8_0.11_45)]"
-        />
-        <NumberCard
-          icon={Droplet}
-          label="Water (cups)"
-          value={log.waterCups}
-          step={1}
-          max={20}
-          onChange={(v) => upsertWellness(todayKey, { waterCups: v })}
-          accent="bg-[oklch(0.7_0.08_220_/_0.18)] text-[oklch(0.45_0.1_220)] dark:text-[oklch(0.78_0.09_220)]"
         />
         <EnergyCard
           value={log.energy ?? 0}
