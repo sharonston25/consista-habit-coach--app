@@ -391,5 +391,11 @@ export function useAchievements() {
     s.streakFreezes = Math.min(5, s.streakFreezes + 1);
     setAchievementsState(s);
   }, []);
-  return { state, mounted, unlock, useFreeze, grantFreeze };
+  const markMilestone = useCallback((streak: number) => {
+    const s = getAchievements();
+    if ((s.lastMilestoneCelebrated ?? 0) >= streak) return;
+    s.lastMilestoneCelebrated = streak;
+    setAchievementsState(s);
+  }, []);
+  return { state, mounted, unlock, useFreeze, grantFreeze, markMilestone };
 }
