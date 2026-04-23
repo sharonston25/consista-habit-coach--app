@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useSettings, useProfile, useHabits, resetAll } from "@/lib/habits/store";
 import { useTheme } from "@/hooks/use-theme";
+import { resetTour } from "@/components/OnboardingTour";
 import type { ActivityLevel, Gender, Goal, Role, UserProfile } from "@/lib/habits/types";
 import {
   ACTIVITY_OPTIONS,
@@ -24,6 +25,7 @@ import {
   Heart,
   Activity,
   Footprints,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
