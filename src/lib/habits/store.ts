@@ -183,12 +183,14 @@ export function useHabits() {
   const addHabit = useCallback((h: Omit<Habit, "id" | "createdAt">) => {
     const next: Habit = { ...h, id: `h-${Date.now()}`, createdAt: new Date().toISOString() };
     setHabits([...getHabits(), next]);
+    emitEvent("habit:created", { habitId: next.id });
   }, []);
   const removeHabit = useCallback((id: string) => {
     setHabits(getHabits().filter((h) => h.id !== id));
     const recs = getRecords();
     delete recs[id];
     setRecords(recs);
+    emitEvent("habit:deleted", { habitId: id });
   }, []);
   const updateHabit = useCallback((id: string, patch: Partial<Habit>) => {
     setHabits(getHabits().map((h) => (h.id === id ? { ...h, ...patch } : h)));
@@ -205,6 +207,9 @@ export function useRecords() {
     if (status === "empty") delete r[habitId][dateKey];
     else r[habitId][dateKey] = status;
     setRecords(r);
+    if (status === "done" || status === "partial") {
+      emitEvent("habit:completed", { habitId, dateKey, status });
+    }
   }, []);
   const cycleStatus = useCallback((habitId: string, dateKey: string) => {
     const r = getRecords();
@@ -215,6 +220,9 @@ export function useRecords() {
     if (next === "empty") delete r[habitId][dateKey];
     else r[habitId][dateKey] = next;
     setRecords(r);
+    if (next === "done" || next === "partial") {
+      emitEvent("habit:completed", { habitId, dateKey, status: next });
+    }
   }, []);
   return { records, mounted, setStatus, cycleStatus };
 }
