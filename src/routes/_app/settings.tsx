@@ -456,6 +456,15 @@ function Settings() {
           All your habit data lives on this device only. AI coach messages are sent to the AI service to
           generate replies, but they aren't tied to an account.
         </p>
+        <button
+          onClick={() => {
+            resetTour();
+            toast.success("Tour reset — visit Dashboard to replay it.");
+          }}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm font-medium hover:bg-background"
+        >
+          <Sparkles className="h-4 w-4 text-primary" /> Replay onboarding tour
+        </button>
       </Card>
 
       {/* Danger zone */}
