@@ -24,13 +24,18 @@ export type AppEvents = {
 type EventName = keyof AppEvents;
 type Handler<E extends EventName> = (payload: AppEvents[E]) => void;
 
-const handlers: { [K in EventName]?: Set<Handler<K>> } = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handlers = new Map<EventName, Set<(payload: any) => void>>();
 
 export function on<E extends EventName>(event: E, handler: Handler<E>): () => void {
-  if (!handlers[event]) handlers[event] = new Set() as Set<Handler<E>>;
-  (handlers[event] as Set<Handler<E>>).add(handler);
+  let set = handlers.get(event);
+  if (!set) {
+    set = new Set();
+    handlers.set(event, set);
+  }
+  set.add(handler as (p: unknown) => void);
   return () => {
-    (handlers[event] as Set<Handler<E>>).delete(handler);
+    set!.delete(handler as (p: unknown) => void);
   };
 }
 
