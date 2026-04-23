@@ -28,6 +28,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
 
 export const Route = createFileRoute("/_app/settings")({
   component: Settings,
