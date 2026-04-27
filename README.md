@@ -69,7 +69,7 @@ This project strengthened my practical understanding of modular frontend design,
 <img width="1164" height="721" alt="consista home page" src="https://github.com/user-attachments/assets/a80171b7-585f-47c2-a28e-d64cb42d5306" />
 ## Live Demo
 
-[Open Consista Habit Coach](your-live-link)
+[Open Consista Habit Coach]([your-live-link](https://lustrous-haupia-df5acb.netlify.app/dashboard))
 
 Developed By
 Sharon
