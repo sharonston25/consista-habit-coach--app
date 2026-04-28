@@ -1,75 +1,56 @@
- Consista Habit Coach
+# Consista Habit Coach
 
-Overview
+## Overview
+Consista Habit Coach is a modern habit-building and wellness tracking app built with TanStack Start.
 
-Consista Habit Coach is a modern habit-building and wellness tracking application designed to help users develop consistency in daily routines, improve self-discipline, and monitor personal progress through structured habit management.
+## Netlify deployment (what was changed in this repo)
+To make this repo deploy-ready on Netlify, these changes are now in place:
 
-Problem Statement
+1. **Netlify adapter plugin added to Vite config** (`vite.config.ts`):
+   - `@netlify/vite-plugin-tanstack-start` is registered via `plugins: [netlify()]`.
+2. **Netlify build config added** (`netlify.toml`):
+   - build command: `npm run build`
+   - publish directory: `dist/client`
+   - Node runtime pinned to `20`
+3. **Environment variable template added** (`.env.example`):
+   - includes all required server/client variables used by the app.
 
-Many users struggle to maintain daily habits consistently because most tracking systems are either too simple or lack motivation-based features. This project addresses that by combining tracking, gamification, and wellness support in one platform.
+## Deploy steps in Netlify
+1. Push the repository to GitHub/GitLab/Bitbucket.
+2. In Netlify: **Add new site → Import an existing project**.
+3. Netlify should pick up `netlify.toml` automatically.
+4. In **Site settings → Environment variables**, set:
+   - `SUPABASE_URL`
+   - `SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `LOVABLE_API_KEY`
+   - (optional client aliases) `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
+5. Trigger deploy.
 
- Solution
+## Post-deploy smoke checks
+- Load `/` and a few app routes (dashboard/reports/settings).
+- Test API endpoints used by the app:
+  - `/api/coach`
+  - `/api/weekly-review`
+  - `/api/vision`
+- Confirm Supabase auth/session behavior.
 
-The application provides a structured environment where users can manage habits, monitor streaks, and gradually improve daily discipline using interactive modules.
 
- Key Features
+### Optional: use another AI provider
+AI routes now support provider-agnostic env vars:
+- `AI_API_KEY`
+- `AI_CHAT_COMPLETIONS_URL` (OpenAI-compatible `/v1/chat/completions` endpoint)
 
-* Daily habit tracking
-* Streak monitoring
-* Achievement and badge system
-* Milestone celebrations
-* Water tracker
-* Sleep logger
-* Weight history chart
-* Nutrition tracking
-* Weekly AI review
-* Push notifications
-* PWA install support
-* Dashboard widget system
-* Family / partner sharing support
-* Student wellness hub
-* Men's wellness hub
+If these are set, they are used instead of `LOVABLE_API_KEY`.
 
-Technical Stack
+## Notes
+If deploy fails during dependency installation, verify your Netlify environment has access to npm registry/scoped packages used by this project.
 
-* TypeScript
-* React
-* TSX Components
-* Modular Feature Architecture
-* Feature Flags System
-
-Project Architecture
-
-The project follows a modular architecture where each major feature is separated into dedicated slices for scalability and maintainability.
-
-Example modules:
-
-* habits
-* nutrition
-* wellness
-* gamification
-* platform flags
-
-Scalability Design
-
-Feature flags are used to enable controlled rollout of future features without affecting existing functionality.
-
-Future Enhancements
-
-* AI-based personalized habit suggestions
-* Smart reminder optimization
-* Mood analysis integration
-* Multi-user collaboration
-* Cloud sync
-
-Learning Outcome
-
-This project strengthened my practical understanding of modular frontend design, scalable feature planning, and product-oriented development.
 
 <img width="1164" height="721" alt="consista home page" src="https://github.com/user-attachments/assets/a80171b7-585f-47c2-a28e-d64cb42d5306" />
 ## Live Demo
 
 [Open Consista Habit Coach]([your-live-link](https://lustrous-haupia-df5acb.netlify.app/dashboard))
 
-Developed By
+## Developed By
 Sharon
