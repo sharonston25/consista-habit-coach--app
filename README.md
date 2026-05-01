@@ -3,8 +3,6 @@
 ## Overview
 Consista Habit Coach is a modern habit-building and wellness tracking app built with TanStack Start.
 
-## Netlify deployment (what was changed in this repo)
-To make this repo deploy-ready on Netlify, these changes are now in place:
 
 1. **Netlify adapter plugin added to Vite config** (`vite.config.ts`):
    - `@netlify/vite-plugin-tanstack-start` is registered via `plugins: [netlify()]`.
